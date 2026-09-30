@@ -1,0 +1,1389 @@
+/* ============ ПРОМЕНЛИВИ (боја, размери) ============ */
+:root {
+    --bg: #f5f6fa;
+    --card: #ffffff;
+    --text: #14161f;
+    --text-muted: #6b7280;
+    --border: #e8eaf0;
+    --primary: #6366f1;
+    --primary-soft: #eef0ff;
+    --income: #10b981;
+    --spent: #ef4444;
+    --shadow: 0 1px 2px rgba(20, 22, 31, 0.04), 0 4px 16px rgba(20, 22, 31, 0.04);
+    --radius: 20px;
+}
+
+[data-theme="dark"] {
+    --bg: #0d0f16;
+    --card: #171a24;
+    --text: #f3f4f8;
+    --text-muted: #9097a8;
+    --border: #262a38;
+    --primary: #818cf8;
+    --primary-soft: #23264a;
+    --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 4px 16px rgba(0, 0, 0, 0.3);
+}
+
+/* ============ RESET ============ */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    transition: background 0.25s ease, color 0.25s ease;
+}
+
+button {
+    font-family: inherit;
+    cursor: pointer;
+    border: none;
+    background: none;
+    color: inherit;
+}
+
+/* ============ ЛАЈАУТ ============ */
+.app {
+    max-width: 480px;
+    margin: 0 auto;
+    padding: 24px 20px calc(140px + env(safe-area-inset-bottom));
+}
+
+/* ============ HEADER ============ */
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 28px;
+}
+
+.header__greeting {
+    font-size: 14px;
+    color: var(--text-muted);
+    margin-bottom: 4px;
+}
+
+.header__title {
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+}
+
+.header__right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.icon-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    font-size: 16px;
+    transition: transform 0.15s ease;
+}
+
+.icon-btn:hover {
+    transform: scale(1.06);
+}
+
+.avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--primary);
+    color: #fff;
+    display: grid;
+    place-items: center;
+    font-weight: 600;
+}
+
+/* ============ МЕСЕЦ ============ */
+.month-bar {
+    margin-bottom: 14px;
+}
+
+.month-bar__label {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text-muted);
+}
+
+/* ============ КАРТИЧКА ============ */
+.card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 24px;
+    margin-bottom: 20px;
+}
+
+/* ============ OVERVIEW ============ */
+.overview__label {
+    font-size: 14px;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+}
+
+.overview__amount {
+    font-size: 44px;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    margin-bottom: 20px;
+}
+
+.progress {
+    height: 10px;
+    background: var(--primary-soft);
+    border-radius: 999px;
+    overflow: hidden;
+}
+
+.progress__bar {
+    height: 100%;
+    background: var(--primary);
+    border-radius: 999px;
+    transition: width 0.6s ease;
+}
+
+.progress__text {
+    font-size: 13px;
+    color: var(--text-muted);
+    margin-top: 8px;
+}
+
+.overview__stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-top: 22px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+}
+
+.stat {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.stat__label {
+    font-size: 13px;
+    color: var(--text-muted);
+}
+
+.stat__value {
+    font-size: 20px;
+    font-weight: 700;
+}
+
+.stat__value--income { color: var(--income); }
+.stat__value--spent  { color: var(--spent); }
+
+/* ============ НАСЛОВ НА КАРТИЧКА ============ */
+.card__title {
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 24px;
+}
+
+/* ============ DONUT ГРАФИК ============ */
+.donut {
+    position: relative;
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    margin: 0 auto 28px;
+}
+
+/* дупката во средината */
+.donut::after {
+    content: '';
+    position: absolute;
+    inset: 28px;
+    background: var(--card);
+    border-radius: 50%;
+}
+
+.donut__center {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    padding: 0 30px;
+}
+
+.donut__label {
+    font-size: 12px;
+    color: var(--text-muted);
+}
+
+.donut__total {
+    font-size: 24px;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    white-space: nowrap;
+}
+
+/* ============ ЛЕГЕНДА ============ */
+.legend {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.legend__item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 8px;
+    border-radius: 12px;
+    transition: background 0.15s ease;
+}
+
+.legend__item:hover {
+    background: var(--bg);
+}
+
+.legend__dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.legend__name {
+    flex: 1;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.legend__percent {
+    font-size: 13px;
+    color: var(--text-muted);
+    min-width: 40px;
+    text-align: right;
+}
+
+.legend__amount {
+    font-size: 14px;
+    font-weight: 600;
+    min-width: 80px;
+    text-align: right;
+}
+
+/* ============ CHIPS (избор на категорија) ============ */
+.chips {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    padding-bottom: 6px;
+    margin-bottom: 20px;
+    scrollbar-width: none;
+}
+
+.chips::-webkit-scrollbar {
+    display: none;
+}
+
+.chip {
+    flex-shrink: 0;
+    padding: 8px 14px;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    background: var(--bg);
+    font-size: 13px;
+    font-weight: 500;
+    transition: all 0.15s ease;
+}
+
+.chip:hover {
+    border-color: var(--primary);
+}
+
+.chip--active {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: #fff;
+}
+
+/* ============ КОНТЕКСТ ============ */
+.context__headline {
+    font-size: 18px;
+    line-height: 1.4;
+    margin-bottom: 20px;
+}
+
+.context__headline strong {
+    font-weight: 800;
+}
+
+.context__grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.context__item {
+    background: var(--bg);
+    border-radius: 14px;
+    padding: 14px 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    text-align: center;
+}
+
+.context__value {
+    font-size: 18px;
+    font-weight: 700;
+}
+
+.context__label {
+    font-size: 12px;
+    color: var(--text-muted);
+}
+
+.trend--up   { color: var(--spent); }
+.trend--down { color: var(--income); }
+
+/* ============ INSIGHT ============ */
+.insight {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    background: var(--primary-soft);
+    border-radius: 14px;
+    padding: 14px 16px;
+}
+
+.insight__icon {
+    font-size: 18px;
+}
+
+.insight__text {
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+/* ============ DARK: native контроли (date, select) ============ */
+[data-theme="dark"] {
+    color-scheme: dark;
+}
+
+/* ============ КОПЧЕ + (FAB) ============ */
+.fab {
+    position: fixed;
+    bottom: calc(88px + env(safe-area-inset-bottom));
+    right: max(20px, calc(50% - 220px));
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: var(--primary);
+    color: #fff;
+    font-size: 32px;
+    line-height: 1;
+    box-shadow: 0 8px 24px rgba(99, 102, 241, 0.4);
+    transition: transform 0.15s ease;
+    z-index: 10;
+}
+
+.fab:hover {
+    transform: scale(1.08);
+}
+
+/* ============ MODAL ============ */
+.modal {
+    position: fixed;
+    inset: 0;
+    z-index: 20;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    visibility: hidden;
+    opacity: 0;
+    transition: opacity 0.2s ease, visibility 0.2s ease;
+}
+
+.modal--open {
+    visibility: visible;
+    opacity: 1;
+}
+
+.modal__backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.45);
+}
+
+.modal__sheet {
+    position: relative;
+    width: 100%;
+    max-width: 480px;
+    max-height: 92vh;
+    max-height: 92dvh;
+    overflow-y: auto;
+    background: var(--card);
+    border-radius: 24px 24px 0 0;
+    padding: 24px 20px calc(28px + env(safe-area-inset-bottom));
+    transform: translateY(24px);
+    transition: transform 0.25s ease;
+}
+
+.modal--open .modal__sheet {
+    transform: translateY(0);
+}
+
+.modal__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.modal__title {
+    font-size: 20px;
+    font-weight: 700;
+}
+
+/* ============ ПОЛИЊА ============ */
+.field {
+    display: block;
+    margin-bottom: 16px;
+}
+
+.field__label {
+    display: block;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+}
+
+.input {
+    width: 100%;
+    padding: 12px 14px;
+    font-family: inherit;
+    font-size: 16px;
+    color: var(--text);
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    outline: none;
+    transition: border-color 0.15s ease;
+}
+
+.input:focus {
+    border-color: var(--primary);
+}
+
+.money-input {
+    position: relative;
+}
+
+.money-input__symbol {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--text-muted);
+}
+
+.input--amount {
+    padding-left: 36px;
+    font-size: 24px;
+    font-weight: 700;
+}
+
+/* ============ SEGMENTED (Cash / Card / Bank) ============ */
+.segmented {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+}
+
+.segmented__option input {
+    display: none;
+}
+
+.segmented__option span {
+    display: block;
+    text-align: center;
+    padding: 11px 0;
+    font-size: 14px;
+    font-weight: 500;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.segmented__option input:checked + span {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: #fff;
+}
+
+/* ============ КОПЧЕ ЗА ПОТВРДА ============ */
+.btn-primary {
+    width: 100%;
+    margin-top: 8px;
+    padding: 15px;
+    font-size: 16px;
+    font-weight: 600;
+    color: #fff;
+    background: var(--primary);
+    border-radius: 14px;
+    transition: opacity 0.15s ease;
+}
+
+.btn-primary:hover {
+    opacity: 0.9;
+}
+
+/* ============ TOOLBAR (search + filter) ============ */
+.toolbar {
+    display: grid;
+    grid-template-columns: 1.3fr 1fr;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+/* ============ ЛИСТА НА ТРАНСАКЦИИ ============ */
+.tx-group__head {
+    display: flex;
+    justify-content: space-between;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-muted);
+    margin: 18px 0 6px;
+}
+
+.tx-group:first-child .tx-group__head {
+    margin-top: 0;
+}
+
+.tx {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+}
+
+.tx-group .tx:last-child {
+    border-bottom: none;
+}
+
+.tx__icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
+    display: grid;
+    place-items: center;
+    font-size: 20px;
+    flex-shrink: 0;
+}
+
+.tx__info {
+    flex: 1;
+    min-width: 0;
+}
+
+.tx__title {
+    font-size: 15px;
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.tx__meta {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-top: 2px;
+}
+
+.tx__amount {
+    font-size: 15px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.tx__actions {
+    display: flex;
+    gap: 2px;
+}
+
+.tx__btn {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    font-size: 14px;
+    opacity: 0.6;
+    transition: all 0.15s ease;
+}
+
+.tx__btn:hover {
+    opacity: 1;
+    background: var(--bg);
+}
+
+.empty {
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 14px;
+    padding: 24px 0;
+}
+
+/* ============ НАСЛОВ СО КОПЧЕ ============ */
+.card__head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+}
+
+.card__head .card__title {
+    margin-bottom: 0;
+}
+
+/* ============ BUDGET ============ */
+.budget-row {
+    margin-bottom: 20px;
+}
+
+.budget-row:last-child {
+    margin-bottom: 0;
+}
+
+.budget-row__top {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 8px;
+}
+
+.budget-row__name {
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.budget-row__nums {
+    font-size: 13px;
+    color: var(--text-muted);
+}
+
+.budget-row__nums strong {
+    color: var(--text);
+    font-weight: 700;
+}
+
+.budget-row__note {
+    font-size: 12px;
+    margin-top: 6px;
+    color: var(--text-muted);
+}
+
+.progress--thin {
+    height: 8px;
+}
+
+.progress__bar--warn { background: #f59e0b; }
+.progress__bar--over { background: var(--spent); }
+
+.budget-row__note--over {
+    color: var(--spent);
+    font-weight: 600;
+}
+
+/* ============ ПРЕДУПРЕДУВАЊЕ ============ */
+.alert {
+    background: rgba(239, 68, 68, 0.1);
+    color: var(--spent);
+    border-radius: 12px;
+    padding: 12px 14px;
+    font-size: 13px;
+    font-weight: 500;
+    margin-bottom: 8px;
+}
+
+#budgetAlerts {
+    margin-bottom: 20px;
+}
+
+#budgetAlerts:empty {
+    display: none;
+}
+
+/* ============ ПОЛИЊА ВО BUDGET ФОРМАТА ============ */
+.budget-field {
+    display: grid;
+    grid-template-columns: 1fr 110px;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 10px;
+}
+
+.budget-field__name {
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.budget-field .input {
+    padding: 10px 12px;
+    font-size: 16px;
+    text-align: right;
+}
+
+/* ============ SAVINGS GOALS ============ */
+.goal {
+    margin-bottom: 24px;
+}
+
+.goal:last-child {
+    margin-bottom: 0;
+}
+
+.goal__top {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 10px;
+}
+
+.goal__name {
+    font-size: 15px;
+    font-weight: 600;
+}
+
+.goal__nums {
+    font-size: 13px;
+    color: var(--text-muted);
+}
+
+.goal__nums strong {
+    color: var(--text);
+    font-weight: 700;
+}
+
+.progress__bar--goal {
+    background: var(--income);
+}
+
+.goal__bottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 10px;
+}
+
+.goal__note {
+    font-size: 13px;
+    color: var(--text-muted);
+}
+
+.goal__actions {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+/* ============ SUBSCRIPTIONS ============ */
+.tx__icon--letter {
+    background: var(--primary-soft);
+    color: var(--primary);
+    font-size: 16px;
+    font-weight: 700;
+}
+
+.subs .overview__stats {
+    margin-top: 12px;
+}
+
+.subs .insight {
+    margin-top: 16px;
+}
+
+/* ============ SMART INSIGHTS ============ */
+.insight-item {
+    display: flex;
+    gap: 14px;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--border);
+}
+
+.insight-item:first-child {
+    padding-top: 0;
+}
+
+.insight-item:last-child {
+    padding-bottom: 0;
+    border-bottom: none;
+}
+
+.insight-item__icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
+    background: var(--primary-soft);
+    display: grid;
+    place-items: center;
+    font-size: 20px;
+    flex-shrink: 0;
+}
+
+.insight-item__title {
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.insight-item__text {
+    font-size: 13px;
+    line-height: 1.5;
+    color: var(--text-muted);
+    margin-top: 2px;
+}
+
+/* ============ ТАБОВИ (Week / Month / Year) ============ */
+.tabs {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 4px;
+    padding: 4px;
+    background: var(--bg);
+    border-radius: 14px;
+    margin-bottom: 22px;
+}
+
+.tab {
+    padding: 9px 0;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-muted);
+    border-radius: 10px;
+    transition: all 0.15s ease;
+}
+
+.tab--active {
+    background: var(--card);
+    color: var(--text);
+    box-shadow: var(--shadow);
+}
+
+/* ============ ВКУПНО ============ */
+.analytics__total {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    margin-bottom: 4px;
+}
+
+.analytics__amount {
+    font-size: 28px;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+}
+
+.analytics__period {
+    font-size: 13px;
+    color: var(--text-muted);
+}
+
+/* ============ СТОЛБЕСТ ГРАФИК ============ */
+.bars {
+    display: flex;
+    align-items: stretch;
+    gap: 6px;
+    height: 190px;
+    margin: 20px 0 28px;
+}
+
+.bar-col {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    min-width: 0;
+}
+
+.bar__value {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-muted);
+    height: 14px;
+}
+
+.bar-track {
+    flex: 1;
+    width: 100%;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+}
+
+.bar {
+    width: 100%;
+    max-width: 38px;
+    min-height: 4px;
+    background: var(--primary);
+    opacity: 0.35;
+    border-radius: 8px 8px 4px 4px;
+    transition: height 0.4s ease;
+}
+
+.bar--current {
+    opacity: 1;
+}
+
+.bar__label {
+    font-size: 11px;
+    color: var(--text-muted);
+}
+
+/* ============ ТОП КАТЕГОРИИ ============ */
+.subtitle {
+    font-size: 14px;
+    font-weight: 700;
+    margin-bottom: 16px;
+}
+
+/* ============ АВАТАР КАКО КОПЧЕ ============ */
+.avatar {
+    cursor: pointer;
+    transition: transform 0.15s ease;
+}
+
+.avatar:hover {
+    transform: scale(1.06);
+}
+
+/* ============ SETTINGS ============ */
+.settings__hint {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-top: 6px;
+}
+
+.settings__section {
+    margin-top: 28px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.btn-secondary,
+.btn-danger {
+    width: 100%;
+    padding: 14px;
+    font-size: 15px;
+    font-weight: 600;
+    border-radius: 14px;
+}
+
+.btn-secondary {
+    background: var(--bg);
+    border: 1px solid var(--border);
+}
+
+.btn-danger {
+    color: var(--spent);
+    background: rgba(239, 68, 68, 0.1);
+}
+
+/* ============ МЕСЕЦ НАВИГАЦИЈА ============ */
+.month-nav {
+    display: flex;
+    gap: 8px;
+}
+
+.icon-btn:disabled {
+    opacity: 0.35;
+    cursor: default;
+    transform: none;
+}
+
+.review__month {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text-muted);
+    margin: -10px 0 18px;
+}
+
+/* ============ БОИ ЗА ИЗНОСИ ============ */
+.text-income { color: var(--income); }
+.text-spent  { color: var(--spent); }
+
+/* ============ REVIEW ============ */
+.review__line {
+    font-size: 13px;
+    color: var(--text-muted);
+    line-height: 1.6;
+    margin-top: 14px;
+}
+
+.review__line strong {
+    display: block;
+    font-size: 16px;
+    color: var(--text);
+}
+
+.review__block {
+    margin-top: 26px;
+}
+
+.rate {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.rate__value {
+    font-size: 28px;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+}
+
+.rate__label {
+    font-size: 13px;
+    color: var(--text-muted);
+}
+
+/* ============ РЕДОВИ (споредба и факти) ============ */
+.fact-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 11px 0;
+    font-size: 14px;
+    border-bottom: 1px solid var(--border);
+}
+
+.fact-row:last-of-type {
+    border-bottom: none;
+}
+
+.fact-row__value {
+    font-weight: 700;
+}
+
+.afford__result .insight {
+    margin-top: 16px;
+}
+
+/* ============ МЕНИ ДОЛУ ============ */
+.bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    max-width: 480px;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    padding: 8px 8px calc(8px + env(safe-area-inset-bottom));
+    background: var(--card);
+    border-top: 1px solid var(--border);
+    z-index: 9;
+}
+
+.nav-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    padding: 6px 0;
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--text-muted);
+    border-radius: 12px;
+    transition: color 0.15s ease;
+}
+
+.nav-btn__icon {
+    font-size: 20px;
+}
+
+.nav-btn--active {
+    color: var(--primary);
+}
+
+/* секцијата не залепува до самиот раб кога скокаш до неа */
+section {
+    scroll-margin-top: 16px;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+.stat__value,
+.context__value,
+.analytics__amount {
+    overflow-wrap: anywhere;
+}
+
+.context__item {
+    min-width: 0;
+}
+
+/* ============ MOBILE POLISH ============ */
+
+/* нема бело трепкање и нема доцнење на допир */
+* {
+    -webkit-tap-highlight-color: transparent;
+}
+
+button, .chip, .tab, .nav-btn, .segmented__option span {
+    touch-action: manipulation;
+}
+
+/* страницата не се движи зад отворена форма */
+body:has(.modal--open) {
+    overflow: hidden;
+}
+
+body {
+    overflow-x: hidden;
+}
+
+/* без малите стрелки во полињата за број (на телефон само пречат) */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+input[type="number"] {
+    -moz-appearance: textfield;
+    appearance: textfield;
+}
+
+/* подолги допири = поголеми цели (прст, не глушец) */
+@media (pointer: coarse) {
+    .icon-btn  { width: 44px; height: 44px; }
+    .tx__btn   { width: 38px; height: 38px; }
+    .chip      { padding: 10px 16px; }
+    .tab       { padding: 12px 0; }
+    .input     { min-height: 48px; }
+    .nav-btn   { padding: 8px 0; }
+}
+
+/* хувер ефектите само кај глушец (на телефон "залепуваат") */
+@media (hover: none) {
+    .icon-btn:hover, .avatar:hover, .fab:hover { transform: none; }
+}
+
+/* многу тесни телефони (iPhone SE, стари Android) */
+@media (max-width: 380px) {
+    .app            { padding-left: 14px; padding-right: 14px; }
+    .card           { padding: 18px; }
+    .header__title  { font-size: 17px; }
+    .context__grid  { gap: 6px; }
+    .context__value { font-size: 15px; }
+    .donut          { width: 180px; height: 180px; }
+    .legend__percent { display: none; }
+    .bars           { gap: 3px; }
+    .toolbar        { grid-template-columns: 1fr; }
+}
+
+/* за корисници што имаат исклучено анимации */
+@media (prefers-reduced-motion: reduce) {
+    * {
+        transition: none !important;
+        animation: none !important;
+        scroll-behavior: auto !important;
+    }
+
+    .splash { display: none; }
+
+}
+
+/* ============ SPLASH ============ */
+.splash {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    background: var(--bg);
+    transition: opacity 0.5s ease, visibility 0.5s ease;
+}
+
+.splash--hide {
+    opacity: 0;
+    visibility: hidden;
+}
+
+.no-splash .splash {
+    display: none;
+}
+
+.splash__coin {
+    font-size: 72px;
+    line-height: 1;
+    animation: coinDrop 1s cubic-bezier(0.3, 1.5, 0.5, 1) both;
+}
+
+.splash__title {
+    font-size: 22px;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    animation: fadeUp 0.6s 0.5s ease both;
+}
+
+.splash__tagline {
+    font-size: 14px;
+    color: var(--text-muted);
+    animation: fadeUp 0.6s 0.7s ease both;
+}
+
+.splash__bar {
+    width: 140px;
+    height: 4px;
+    margin-top: 12px;
+    border-radius: 999px;
+    background: var(--primary-soft);
+    overflow: hidden;
+}
+
+.splash__bar span {
+    display: block;
+    height: 100%;
+    border-radius: inherit;
+    background: var(--primary);
+    animation: splashLoad 1.4s 0.2s ease-in-out both;
+}
+
+/* ============ KEYFRAMES ============ */
+@keyframes coinDrop {
+    0%   { opacity: 0; transform: translateY(-140px) rotateY(0deg); }
+    40%  { opacity: 1; }
+    100% { opacity: 1; transform: translateY(0) rotateY(720deg); }
+}
+
+@keyframes splashLoad {
+    from { width: 0; }
+    to   { width: 100%; }
+}
+
+@keyframes fadeUp {
+    from { opacity: 0; transform: translateY(18px); }
+}
+
+@keyframes growX {
+    from { transform: scaleX(0); }
+}
+
+@keyframes growY {
+    from { transform: scaleY(0); }
+}
+
+@keyframes donutPop {
+    from { opacity: 0; transform: scale(0.75); }
+}
+
+@keyframes fabPop {
+    from { transform: scale(0) rotate(-90deg); }
+}
+
+@keyframes navUp {
+    from { transform: translateX(-50%) translateY(100%); }
+    to   { transform: translateX(-50%) translateY(0); }
+}
+
+/* ============ ВЛЕЗНИ АНИМАЦИИ (кога ќе исчезне splash) ============ */
+/* "backwards" = пред почеток е невидливо, а по крајот враќа на нормално,
+   па не ги блокира hover/active ефектите */
+body.loaded .main .card {
+    animation: fadeUp 0.5s ease backwards;
+    animation-delay: calc(var(--i, 0) * 70ms);
+}
+
+body.loaded .donut {
+    animation: donutPop 0.8s 0.15s cubic-bezier(0.2, 0.8, 0.2, 1) backwards;
+}
+
+body.loaded .fab {
+    animation: fabPop 0.6s 0.5s cubic-bezier(0.3, 1.6, 0.5, 1) backwards;
+}
+
+body.loaded .bottom-nav {
+    animation: navUp 0.5s 0.3s ease backwards;
+}
+
+.progress__bar {
+    transform-origin: left;
+}
+
+body.loaded .progress__bar {
+    animation: growX 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) backwards;
+}
+
+.bar {
+    transform-origin: bottom;
+}
+
+body.loaded .bar {
+    animation: growY 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) backwards;
+}
+
+/* ============ ПРИТИСОК НА КОПЧИЊА ============ */
+.fab:active, .btn-primary:active, .btn-secondary:active, .btn-danger:active,
+.chip:active, .icon-btn:active, .nav-btn:active, .tab:active {
+    transform: scale(0.95);
+}
+
+/* мазен премин светло/темно */
+.card, .bottom-nav {
+    transition: background 0.25s ease, border-color 0.25s ease;
+}
+
+/* ============ TOAST ============ */
+.toast {
+    position: fixed;
+    left: 50%;
+    bottom: calc(96px + env(safe-area-inset-bottom));
+    transform: translate(-50%, 20px);
+    z-index: 30;
+    padding: 12px 18px;
+    border-radius: 999px;
+    background: var(--text);
+    color: var(--bg);
+    font-size: 14px;
+    font-weight: 600;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.toast--show {
+    opacity: 1;
+    transform: translate(-50%, 0);
+}

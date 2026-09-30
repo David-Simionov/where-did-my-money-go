@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="mk" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#f5f6fa">
+  <title>Where Did My Money Go?</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>💰</text></svg>">
+  <meta name="description" content="See where your money goes. Take control of where it goes next.">
+  <meta property="og:title" content="Where Did My Money Go?">
+  <meta property="og:description" content="See where your money goes. Take control of where it goes next.">
+
+  <script>
+    // рана проверка: без бело трепкање во dark mode и без повторен splash во иста сесија
+    try {
+      const t = localStorage.getItem('theme');
+      if (t) document.documentElement.setAttribute('data-theme', t);
+      if (sessionStorage.getItem('splashSeen')) document.documentElement.classList.add('no-splash');
+    } catch (e) {}
+  </script>
+
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<!-- SPLASH -->
+<div class="splash" id="splash">
+  <div class="splash__coin">💰</div>
+  <p class="splash__title">Where Did My Money Go?</p>
+  <p class="splash__tagline">See where your money goes.</p>
+  <div class="splash__bar"><span></span></div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<div class="app">
+
+  <!-- HEADER -->
+  <header class="header">
+    <div class="header__left">
+      <p class="header__greeting" id="greeting">Good evening 👋</p>
+      <h1 class="header__title">Where Did My Money Go?</h1>
+    </div>
+    <div class="header__right">
+      <button class="icon-btn" id="themeToggle" aria-label="Смени тема">🌙</button>
+      <button class="avatar" id="openSettings" aria-label="Settings">👤</button>
+    </div>
+  </header>
+
+  <!-- ПРЕГЛЕД НА ПАРИТЕ -->
+  <main class="main">
+
+    <section class="month-bar">
+      <h2 class="month-bar__label" id="monthLabel">September 2026</h2>
+    </section>
+
+    <section class="card overview" id="sec-home">
+      <p class="overview__label">Remaining</p>
+      <p class="overview__amount" id="remaining">€266.00</p>
+
+      <div class="progress">
+        <div class="progress__bar" id="progressBar" style="width: 73%"></div>
+      </div>
+      <p class="progress__text"><span id="progressPercent">73%</span> of income spent</p>
+
+      <div class="overview__stats">
+        <div class="stat">
+          <span class="stat__label">Income</span>
+          <span class="stat__value stat__value--income" id="income">€1,000</span>
+        </div>
+        <div class="stat">
+          <span class="stat__label">Spent</span>
+          <span class="stat__value stat__value--spent" id="spent">€734</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="card breakdown">
+      <h3 class="card__title">Spending breakdown</h3>
+
+      <div class="donut" id="donut">
+        <div class="donut__center">
+          <span class="donut__label">Total spent</span>
+          <span class="donut__total" id="donutTotal">€734.00</span>
+        </div>
+      </div>
+
+      <ul class="legend" id="legend"></ul>
+    </section>
+
+    <section class="card context-card">
+      <h3 class="card__title">Where did my money go?</h3>
+
+      <div class="chips" id="chips"></div>
+
+      <p class="context__headline" id="ctxHeadline"></p>
+
+      <div class="context__grid">
+        <div class="context__item">
+          <span class="context__value" id="ctxPerDay"></span>
+          <span class="context__label">per day</span>
+        </div>
+        <div class="context__item">
+          <span class="context__value" id="ctxIncomePct"></span>
+          <span class="context__label">of income</span>
+        </div>
+        <div class="context__item">
+          <span class="context__value" id="ctxTrend"></span>
+          <span class="context__label" id="ctxTrendLabel"></span>
+        </div>
+      </div>
+
+      <div class="insight">
+        <span class="insight__icon">💡</span>
+        <p class="insight__text" id="ctxInsight"></p>
+      </div>
+    </section>
+
+    <section class="card insights-card">
+      <h3 class="card__title">💡 Your spending insights</h3>
+      <div id="insightList"></div>
+    </section>
+
+    <section class="card analytics" id="sec-stats">
+      <h3 class="card__title">Analytics</h3>
+
+      <div class="tabs" id="analyticsTabs">
+        <button class="tab" data-period="week">Week</button>
+        <button class="tab tab--active" data-period="month">Month</button>
+        <button class="tab" data-period="year">Year</button>
+      </div>
+
+      <div class="analytics__total">
+        <span class="analytics__amount" id="anTotal"></span>
+        <span class="analytics__period" id="anPeriod"></span>
+      </div>
+
+      <div id="anChart"></div>
+
+      <h4 class="subtitle">Top spending categories</h4>
+      <div id="anTop"></div>
+    </section>
+
+    <section class="card review">
+      <div class="card__head">
+        <h3 class="card__title">Monthly Review</h3>
+        <div class="month-nav">
+          <button class="icon-btn" id="reviewPrev" aria-label="Previous month">‹</button>
+          <button class="icon-btn" id="reviewNext" aria-label="Next month">›</button>
+        </div>
+      </div>
+      <p class="review__month" id="reviewTitle"></p>
+      <div id="reviewBody"></div>
+    </section>
+
+    <section class="card afford">
+      <h3 class="card__title">💰 Can I afford this?</h3>
+
+      <label class="field">
+        <span class="field__label">Price</span>
+        <div class="money-input">
+          <span class="money-input__symbol">€</span>
+          <input type="number" id="affordPrice" class="input input--amount"
+                 placeholder="150" step="0.01" min="0.01" inputmode="decimal">
+        </div>
+      </label>
+
+      <div id="affordResult"></div>
+    </section>
+
+    <section class="card budget" id="sec-budget">
+      <div class="card__head">
+        <h3 class="card__title">Monthly Budget</h3>
+        <button class="chip" id="editBudget">Edit</button>
+      </div>
+
+      <div id="budgetAlerts"></div>
+      <div id="budgetList"></div>
+    </section>
+
+    <section class="card goals" id="sec-goals">
+      <div class="card__head">
+        <h3 class="card__title">Savings Goals</h3>
+        <button class="chip" id="addGoal">+ New</button>
+      </div>
+      <div id="goalList"></div>
+    </section>
+
+    <section class="card subs">
+      <div class="card__head">
+        <h3 class="card__title">Subscriptions</h3>
+        <button class="chip" id="addSub">+ Add</button>
+      </div>
+      <div id="subList"></div>
+      <div id="subSummary"></div>
+    </section>
+
+    <section class="card transactions" id="sec-tx">
+      <h3 class="card__title">Transactions</h3>
+
+      <div class="toolbar">
+        <input type="search" id="searchInput" class="input" placeholder="🔍 Search">
+        <select id="filterSelect" class="input"></select>
+      </div>
+
+      <div id="txList"></div>
+    </section>
+
+  </main>
+</div>
+
+<!-- КОПЧЕ + -->
+<button class="fab" id="openModal" aria-label="Add expense">+</button>
+
+<!-- МЕНИ ДОЛУ -->
+<nav class="bottom-nav">
+  <button class="nav-btn nav-btn--active" data-target="sec-home">
+    <span class="nav-btn__icon">🏠</span>Home
+  </button>
+  <button class="nav-btn" data-target="sec-stats">
+    <span class="nav-btn__icon">📊</span>Stats
+  </button>
+  <button class="nav-btn" data-target="sec-budget">
+    <span class="nav-btn__icon">🎯</span>Budget
+  </button>
+  <button class="nav-btn" data-target="sec-goals">
+    <span class="nav-btn__icon">🏖</span>Goals
+  </button>
+  <button class="nav-btn" data-target="sec-tx">
+    <span class="nav-btn__icon">📅</span>History
+  </button>
+</nav>
+
+<!-- ADD EXPENSE ФОРМА -->
+<div class="modal" id="modal">
+  <div class="modal__backdrop" id="modalBackdrop"></div>
+
+  <form class="modal__sheet" id="expenseForm">
+    <div class="modal__header">
+      <h3 class="modal__title" id="modalTitle">Add Expense</h3>
+      <button type="button" class="icon-btn" id="closeModal" aria-label="Затвори">✕</button>
+    </div>
+
+    <label class="field">
+      <span class="field__label">Amount</span>
+      <div class="money-input">
+        <span class="money-input__symbol">€</span>
+        <input type="number" id="expenseAmount" class="input input--amount"
+               placeholder="0.00" step="0.01" min="0.01" inputmode="decimal" required>
+      </div>
+    </label>
+
+    <label class="field">
+      <span class="field__label">Category</span>
+      <select id="categorySelect" class="input"></select>
+    </label>
+
+    <label class="field">
+      <span class="field__label">Description</span>
+      <input type="text" id="expenseDesc" class="input" placeholder="Lunch" maxlength="60">
+    </label>
+
+    <label class="field">
+      <span class="field__label">Date</span>
+      <input type="date" id="expenseDate" class="input" required>
+    </label>
+
+    <div class="field">
+      <span class="field__label">Payment</span>
+      <div class="segmented">
+        <label class="segmented__option">
+          <input type="radio" name="payment" value="Cash"><span>Cash</span>
+        </label>
+        <label class="segmented__option">
+          <input type="radio" name="payment" value="Card" checked><span>Card</span>
+        </label>
+        <label class="segmented__option">
+          <input type="radio" name="payment" value="Bank"><span>Bank</span>
+        </label>
+      </div>
+    </div>
+
+    <button type="submit" class="btn-primary" id="submitBtn">Add Expense</button>
+  </form>
+</div>
+
+<!-- BUDGET ФОРМА -->
+<div class="modal" id="budgetModal">
+  <div class="modal__backdrop" id="budgetBackdrop"></div>
+
+  <form class="modal__sheet" id="budgetForm">
+    <div class="modal__header">
+      <h3 class="modal__title">Monthly Budget</h3>
+      <button type="button" class="icon-btn" id="closeBudget" aria-label="Затвори">✕</button>
+    </div>
+
+    <label class="field">
+      <span class="field__label">Overall</span>
+      <div class="money-input">
+        <span class="money-input__symbol">€</span>
+        <input type="number" id="budgetOverall" class="input input--amount"
+               placeholder="0" step="1" min="0" inputmode="decimal">
+      </div>
+    </label>
+
+    <p class="field__label">Categories (остави празно ако нема лимит)</p>
+    <div id="budgetFields"></div>
+
+    <button type="submit" class="btn-primary">Save Budget</button>
+  </form>
+</div>
+
+<!-- GOAL ФОРМА -->
+<div class="modal" id="goalModal">
+  <div class="modal__backdrop" id="goalBackdrop"></div>
+
+  <form class="modal__sheet" id="goalForm">
+    <div class="modal__header">
+      <h3 class="modal__title" id="goalModalTitle">New Goal</h3>
+      <button type="button" class="icon-btn" id="closeGoal" aria-label="Затвори">✕</button>
+    </div>
+
+    <label class="field">
+      <span class="field__label">Name</span>
+      <input type="text" id="goalName" class="input" placeholder="Greece Trip" maxlength="40" required>
+    </label>
+
+    <label class="field">
+      <span class="field__label">Icon</span>
+      <select id="goalIcon" class="input">
+        <option value="🏖">🏖 Trip</option>
+        <option value="📱">📱 Phone</option>
+        <option value="💻">💻 PC</option>
+        <option value="🚗">🚗 Car</option>
+        <option value="🛡">🛡 Emergency fund</option>
+        <option value="🎁">🎁 Gift</option>
+        <option value="🎯">🎯 Other</option>
+      </select>
+    </label>
+
+    <label class="field">
+      <span class="field__label">Goal amount</span>
+      <div class="money-input">
+        <span class="money-input__symbol">€</span>
+        <input type="number" id="goalTarget" class="input input--amount"
+               placeholder="500" step="1" min="1" inputmode="decimal" required>
+      </div>
+    </label>
+
+    <label class="field">
+      <span class="field__label">Already saved</span>
+      <input type="number" id="goalSaved" class="input" placeholder="0" step="0.01" min="0" inputmode="decimal">
+    </label>
+
+    <button type="submit" class="btn-primary">Save Goal</button>
+  </form>
+</div>
+
+<!-- SUBSCRIPTION ФОРМА -->
+<div class="modal" id="subModal">
+  <div class="modal__backdrop" id="subBackdrop"></div>
+
+  <form class="modal__sheet" id="subForm">
+    <div class="modal__header">
+      <h3 class="modal__title" id="subModalTitle">Add Subscription</h3>
+      <button type="button" class="icon-btn" id="closeSub" aria-label="Затвори">✕</button>
+    </div>
+
+    <label class="field">
+      <span class="field__label">Name</span>
+      <input type="text" id="subName" class="input" placeholder="Netflix" maxlength="40" required>
+    </label>
+
+    <label class="field">
+      <span class="field__label">Monthly price</span>
+      <div class="money-input">
+        <span class="money-input__symbol">€</span>
+        <input type="number" id="subAmount" class="input input--amount"
+               placeholder="0.00" step="0.01" min="0.01" inputmode="decimal" required>
+      </div>
+    </label>
+
+    <button type="submit" class="btn-primary">Save Subscription</button>
+  </form>
+</div>
+
+<!-- SETTINGS ФОРМА -->
+<div class="modal" id="settingsModal">
+  <div class="modal__backdrop" id="settingsBackdrop"></div>
+
+  <form class="modal__sheet" id="settingsForm">
+    <div class="modal__header">
+      <h3 class="modal__title">Settings</h3>
+      <button type="button" class="icon-btn" id="closeSettings" aria-label="Затвори">✕</button>
+    </div>
+
+    <label class="field">
+      <span class="field__label">Your name</span>
+      <input type="text" id="settingsName" class="input" placeholder="David" maxlength="30">
+    </label>
+
+    <label class="field">
+      <span class="field__label">Monthly income</span>
+      <div class="money-input">
+        <span class="money-input__symbol">€</span>
+        <input type="number" id="settingsIncome" class="input input--amount"
+               placeholder="1000" step="1" min="0" inputmode="decimal">
+      </div>
+    </label>
+
+    <label class="field">
+      <span class="field__label">Currency</span>
+      <select id="settingsCurrency" class="input">
+        <option value="EUR">EUR €</option>
+        <option value="USD">USD $</option>
+        <option value="GBP">GBP £</option>
+        <option value="MKD">MKD ден</option>
+      </select>
+      <p class="settings__hint">Валутата е само ознака. Износите не се претвораат.</p>
+    </label>
+
+    <button type="submit" class="btn-primary">Save</button>
+
+    <div class="settings__section">
+      <button type="button" class="btn-secondary" id="exportCsv">Export CSV</button>
+      <button type="button" class="btn-danger" id="deleteAll">Delete all data</button>
+    </div>
+  </form>
+</div>
+
+<!-- ADD TO GOAL ФОРМА -->
+<div class="modal" id="addSavedModal">
+  <div class="modal__backdrop" id="addSavedBackdrop"></div>
+
+  <form class="modal__sheet" id="addSavedForm">
+    <div class="modal__header">
+      <h3 class="modal__title" id="addSavedTitle">Add to goal</h3>
+      <button type="button" class="icon-btn" id="closeAddSaved" aria-label="Затвори">✕</button>
+    </div>
+
+    <label class="field">
+      <span class="field__label">Amount</span>
+      <div class="money-input">
+        <span class="money-input__symbol">€</span>
+        <input type="number" id="addSavedAmount" class="input input--amount"
+               placeholder="0.00" step="0.01" min="0.01" inputmode="decimal" required>
+      </div>
+    </label>
+
+    <button type="submit" class="btn-primary">Add</button>
+  </form>
+</div>
+
+<script src="js/app.js"></script>
+</body>
+</html>
