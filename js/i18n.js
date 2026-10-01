@@ -193,7 +193,10 @@ const DICT = {
         'Health': 'Здравје',
         'Education': 'Образование',
         'Travel': 'Патувања',
-        'Other': 'Друго'
+        'Other': 'Друго',
+
+        'Install app': 'Инсталирај ја апликацијата',
+        'On iPhone: tap the Share button, then "Add to Home Screen".': 'На iPhone: допри го копчето за споделување, па „Add to Home Screen“.'
     }
 };
 

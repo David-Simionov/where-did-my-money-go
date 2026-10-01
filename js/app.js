@@ -1523,6 +1523,43 @@ function applyLanguage() {
     renderSubs();
 }
 
+// ============ PWA ============
+// 1. service worker (работи само преку https или localhost, не преку file://)
+if ('serviceWorker' in navigator && location.protocol !== 'file:') {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js').catch(() => {});
+    });
+}
+
+// 2. копче "Install app"
+let installEvent = null;
+const installBtn = document.getElementById('installApp');
+const iosHint = document.getElementById('iosHint');
+
+const ua = navigator.userAgent;
+const isIOS = /iphone|ipad|ipod/i.test(ua) || (/Macintosh/i.test(ua) && navigator.maxTouchPoints > 1);
+const isInstalled = window.matchMedia('(display-mode: standalone)').matches || navigator.standalone;
+
+// Android/Chrome: прелистувачот јавува дека може да се инсталира
+window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    installEvent = e;
+    installBtn.hidden = false;
+});
+
+installBtn.addEventListener('click', async () => {
+    if (!installEvent) return;
+    installEvent.prompt();
+    await installEvent.userChoice;
+    installEvent = null;
+    installBtn.hidden = true;
+});
+
+window.addEventListener('appinstalled', () => { installBtn.hidden = true; });
+
+// iPhone нема автоматски прозорец, па покажуваме упатство
+if (isIOS && !isInstalled) iosHint.hidden = false;
+
 // ============ МЕНИ ДОЛУ ============
 const navButtons = document.querySelectorAll('.nav-btn');
 
