@@ -1051,9 +1051,8 @@ function currencySymbol() {
 }
 
 // симболот во полињата за износ (€ / $ / £ / ден)
-function applyCurrencySymbols() {
-    const sym = currencySymbol();
-    document.querySelectorAll('.money-input').forEach(box => {
+function applyCurrencySymbols(sym = currencySymbol(), root = document) {
+    root.querySelectorAll('.money-input').forEach(box => {
         box.querySelector('.money-input__symbol').textContent = sym;
         box.querySelector('.input').style.paddingLeft = sym.length > 1 ? '64px' : '36px';
     });
@@ -1080,6 +1079,10 @@ function openSettingsModal() {
 function closeSettingsModal() {
     settingsModal.classList.remove('modal--open');
 }
+
+document.getElementById('settingsCurrency').addEventListener('change', (e) => {
+    applyCurrencySymbols(CURRENCIES[e.target.value], settingsForm);
+});
 
 document.getElementById('openSettings').addEventListener('click', openSettingsModal);
 document.getElementById('closeSettings').addEventListener('click', closeSettingsModal);
