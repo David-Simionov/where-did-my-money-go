@@ -309,7 +309,7 @@
       </div>
     </label>
 
-    <p class="field__label">Categories (остави празно ако нема лимит)</p>
+    <p class="field__label">Categories (leave empty for no limit)</p>
     <div id="budgetFields"></div>
 
     <button type="submit" class="btn-primary">Save Budget</button>
@@ -422,7 +422,15 @@
         <option value="GBP">GBP £</option>
         <option value="MKD">MKD ден</option>
       </select>
-      <p class="settings__hint">Валутата е само ознака. Износите не се претвораат.</p>
+      <p class="settings__hint">Currency is only a label. Amounts are not converted.</p>
+    </label>
+
+    <label class="field">
+      <span class="field__label">Language</span>
+      <select id="settingsLanguage" class="input">
+        <option value="en">English</option>
+        <option value="mk">Македонски</option>
+      </select>
     </label>
 
     <button type="submit" class="btn-primary">Save</button>
@@ -457,6 +465,7 @@
   </form>
 </div>
 
+<script src="js/i18n.js"></script>
 <script src="js/app.js"></script>
 </body>
 </html>

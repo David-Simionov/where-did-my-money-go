@@ -105,7 +105,7 @@ function formatMoney(amount) {
     const sym = currencySymbol();
     return (amount < 0 ? '-' : '') +
         sym + (sym.length > 1 ? ' ' : '') +
-        Math.abs(amount).toLocaleString('en-US', {
+        Math.abs(amount).toLocaleString(locale(), {
             minimumFractionDigits: 2,
             maximumFractionDigits: 2
         });
@@ -113,7 +113,7 @@ function formatMoney(amount) {
 
 function getGreeting() {
     const hour = new Date().getHours();
-    const part = hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening';
+    const part = hour < 12 ? t('Good morning') : hour < 18 ? t('Good afternoon') : t('Good evening');
     return settings.name ? `${part}, ${settings.name} 👋` : `${part} 👋`;
 }
 
@@ -172,8 +172,7 @@ function renderDashboard() {
     const percent = data.income > 0 ? Math.round((data.spent / data.income) * 100) : 0;
 
     document.getElementById('greeting').textContent = getGreeting();
-    document.getElementById('monthLabel').textContent =
-        new Date().toLocaleString('en-US', { month: 'long', year: 'numeric' });
+    document.getElementById('monthLabel').textContent = monthTitle(new Date());
 
     const remainingEl = document.getElementById('remaining');
     fitText(remainingEl, formatMoney(remaining), 44);   // големината се одредува од крајниот износ
@@ -229,7 +228,7 @@ function renderBreakdown() {
         return `
             <li class="legend__item">
                 <span class="legend__dot" style="background:${c.color}"></span>
-                <span class="legend__name">${c.icon} ${c.name}</span>
+                <span class="legend__name">${c.icon} ${t(c.name)}</span>
                 <span class="legend__percent">${percent}%</span>
                 <span class="legend__amount">${formatMoney(c.amount)}</span>
             </li>`;
@@ -242,13 +241,13 @@ let selectedIndex = 0;
 function renderContext() {
     if (data.categories.length === 0) {
         document.getElementById('chips').innerHTML = '';
-        document.getElementById('ctxHeadline').textContent = 'No expenses yet. Tap + to add your first one.';
+        document.getElementById('ctxHeadline').textContent = t('No expenses yet. Tap + to add your first one.');
         ['ctxPerDay', 'ctxIncomePct', 'ctxTrend'].forEach(id => {
             document.getElementById(id).textContent = '—';
         });
         document.getElementById('ctxTrend').className = 'context__value';
         document.getElementById('ctxTrendLabel').textContent = '';
-        document.getElementById('ctxInsight').textContent = 'Add an expense and your insights will show up here.';
+        document.getElementById('ctxInsight').textContent = t('Add an expense and your insights will show up here.');
         return;
     }
 
@@ -258,7 +257,7 @@ function renderContext() {
     // chips
     document.getElementById('chips').innerHTML = data.categories.map((cat, i) => `
         <button class="chip ${i === selectedIndex ? 'chip--active' : ''}" data-index="${i}">
-            ${cat.icon} ${cat.name}
+            ${cat.icon} ${t(cat.name)}
         </button>`).join('');
 
     // пресметки
@@ -270,12 +269,15 @@ function renderContext() {
     const isUp = diff > 0;
 
     const now = new Date();
-    const prevMonth = new Date(now.getFullYear(), now.getMonth() - 1)
-        .toLocaleString('en-US', { month: 'long' });
+    const prevMonth = getMonthName(new Date(now.getFullYear(), now.getMonth() - 1));
+    const catLower = t(c.name).toLowerCase();
 
     // приказ
     document.getElementById('ctxHeadline').innerHTML =
-        `You spent <strong>${formatMoney(c.amount)}</strong> on ${c.name.toLowerCase()}.`;
+        t('You spent {amount} on {cat}.', {
+            amount: `<strong>${formatMoney(c.amount)}</strong>`,
+            cat: catLower
+        });
     document.getElementById('ctxPerDay').textContent = formatMoney(perDay);
     document.getElementById('ctxIncomePct').textContent = incomePct === null ? '—' : incomePct + '%';
 
@@ -287,14 +289,17 @@ function renderContext() {
         trend.textContent = `${isUp ? '↑' : '↓'} ${Math.abs(diffPct)}%`;
         trend.className = 'context__value ' + (isUp ? 'trend--up' : 'trend--down');
     }
-    document.getElementById('ctxTrendLabel').textContent = 'vs ' + prevMonth;
+    document.getElementById('ctxTrendLabel').textContent = t('vs {month}', { month: prevMonth });
 
     // insight
     let insight;
     if (diff === 0) {
-        insight = `You spent the same on ${c.name.toLowerCase()} as in ${prevMonth}.`;
+        insight = t('You spent the same on {cat} as in {month}.', { cat: catLower, month: prevMonth });
     } else {
-        insight = `You spent ${formatMoney(Math.abs(diff))} ${isUp ? 'more' : 'less'} on ${c.name.toLowerCase()} this month than last month.`;
+        insight = t(isUp
+                ? 'You spent {amount} more on {cat} this month than last month.'
+                : 'You spent {amount} less on {cat} this month than last month.',
+            { amount: formatMoney(Math.abs(diff)), cat: catLower });
     }
     document.getElementById('ctxInsight').textContent = insight;
 }
@@ -312,18 +317,14 @@ const modal = document.getElementById('modal');
 const form = document.getElementById('expenseForm');
 const categorySelect = document.getElementById('categorySelect');
 
-categorySelect.innerHTML = CATEGORIES
-    .map(c => `<option value="${c.name}">${c.icon} ${c.name}</option>`)
-    .join('');
-
 let editingId = null;   // null = додаваме ново, id = уредуваме постоечко
 
 function openModal(expense) {
     form.reset();
     editingId = expense ? expense.id : null;
 
-    document.getElementById('modalTitle').textContent = expense ? 'Edit Expense' : 'Add Expense';
-    document.getElementById('submitBtn').textContent = expense ? 'Save Changes' : 'Add Expense';
+    document.getElementById('modalTitle').textContent = expense ? t('Edit Expense') : t('Add Expense');
+    document.getElementById('submitBtn').textContent = expense ? t('Save Changes') : t('Add Expense');
 
     document.getElementById('expenseAmount').value = expense ? expense.amount : '';
     categorySelect.value = expense ? expense.category : CATEGORIES[0].name;
@@ -374,7 +375,7 @@ form.addEventListener('submit', (e) => {
     saveExpenses();
     closeModal();
     refresh(values.category);
-    showToast(editingId ? 'Expense updated ✓' : 'Expense added ✓');
+    showToast(editingId ? t('Expense updated ✓') : t('Expense added ✓'));
 });
 
 // ============ BUDGET ============
@@ -404,8 +405,8 @@ function budgetRow(name, icon, spent, limit) {
     const left = limit - spent;
 
     const note = state === 'over'
-        ? `Over by ${formatMoney(spent - limit)}`
-        : `${formatMoney(left)} left`;
+        ? t('Over by {amount}', { amount: formatMoney(spent - limit) })
+        : t('{amount} left', { amount: formatMoney(left) });
 
     return `
         <div class="budget-row">
@@ -426,9 +427,9 @@ function renderBudget() {
     const warnings = [];
 
     if (budgets.overall > 0) {
-        rows.push(budgetRow('Overall', '📊', data.spent, budgets.overall));
+        rows.push(budgetRow(t('Overall'), '📊', data.spent, budgets.overall));
         if (data.spent > budgets.overall) {
-            warnings.push(`You've exceeded your overall budget by ${formatMoney(data.spent - budgets.overall)}.`);
+            warnings.push(t("You've exceeded your overall budget by {amount}.", { amount: formatMoney(data.spent - budgets.overall) }));
         }
     }
 
@@ -439,9 +440,9 @@ function renderBudget() {
         const found = data.categories.find(c => c.name === cat.name);
         const spent = found ? found.amount : 0;
 
-        rows.push(budgetRow(cat.name, cat.icon, spent, limit));
+        rows.push(budgetRow(t(cat.name), cat.icon, spent, limit));
         if (spent > limit) {
-            warnings.push(`You've exceeded your ${cat.name} budget by ${formatMoney(spent - limit)}.`);
+            warnings.push(t("You've exceeded your {cat} budget by {amount}.", { cat: t(cat.name), amount: formatMoney(spent - limit) }));
         }
     });
 
@@ -450,19 +451,12 @@ function renderBudget() {
 
     document.getElementById('budgetList').innerHTML = rows.length
         ? rows.join('')
-        : '<p class="empty">No budgets yet. Tap Edit to set your first one.</p>';
+        : '<p class="empty">' + t('No budgets yet. Tap Edit to set your first one.') + '</p>';
 }
 
 // ---- форма за уредување на буџети ----
 const budgetModal = document.getElementById('budgetModal');
 const budgetForm = document.getElementById('budgetForm');
-
-document.getElementById('budgetFields').innerHTML = CATEGORIES.map(c => `
-    <label class="budget-field">
-        <span class="budget-field__name">${c.icon} ${c.name}</span>
-        <input type="number" class="input" data-cat="${c.name}"
-               placeholder="—" step="1" min="0" inputmode="decimal">
-    </label>`).join('');
 
 function openBudgetModal() {
     document.getElementById('budgetOverall').value = budgets.overall || '';
@@ -524,7 +518,7 @@ function renderGoals() {
     const box = document.getElementById('goalList');
 
     if (goals.length === 0) {
-        box.innerHTML = '<p class="empty">No goals yet. Tap + New to create one.</p>';
+        box.innerHTML = `<p class="empty">${t('No goals yet. Tap + New to create one.')}</p>`;
         return;
     }
 
@@ -532,8 +526,8 @@ function renderGoals() {
         const percent = Math.min(100, Math.round((g.saved / g.target) * 100));
         const left = g.target - g.saved;
         const note = left > 0
-            ? `${percent}% · ${formatMoney(left)} remaining`
-            : '🎉 Goal reached!';
+            ? t('{pct}% · {amount} remaining', { pct: percent, amount: formatMoney(left) })
+            : t('🎉 Goal reached!');
 
         return `
             <div class="goal">
@@ -547,7 +541,7 @@ function renderGoals() {
                 <div class="goal__bottom">
                     <span class="goal__note">${note}</span>
                     <div class="goal__actions">
-                        <button class="chip" data-action="add" data-id="${g.id}">+ Add</button>
+                        <button class="chip" data-action="add" data-id="${g.id}">${t('+ Add')}</button>
                         <button class="tx__btn" data-action="edit" data-id="${g.id}" aria-label="Edit">✏️</button>
                         <button class="tx__btn" data-action="delete" data-id="${g.id}" aria-label="Delete">🗑</button>
                     </div>
@@ -564,7 +558,7 @@ let addingToGoalId = null;
 function openAddSavedModal(goal) {
     addingToGoalId = goal.id;
     addSavedForm.reset();
-    document.getElementById('addSavedTitle').textContent = `Add to ${goal.name}`;
+    document.getElementById('addSavedTitle').textContent = t('Add to {name}', { name: goal.name });
     addSavedModal.classList.add('modal--open');
     document.getElementById('addSavedAmount').focus();
 }
@@ -601,7 +595,7 @@ function openGoalModal(goal) {
     goalForm.reset();
     editingGoalId = goal ? goal.id : null;
 
-    document.getElementById('goalModalTitle').textContent = goal ? 'Edit Goal' : 'New Goal';
+    document.getElementById('goalModalTitle').textContent = goal ? t('Edit Goal') : t('New Goal');
     document.getElementById('goalName').value = goal ? goal.name : '';
     document.getElementById('goalIcon').value = goal ? goal.icon : '🎯';
     document.getElementById('goalTarget').value = goal ? goal.target : '';
@@ -652,7 +646,7 @@ document.getElementById('goalList').addEventListener('click', (e) => {
     if (btn.dataset.action === 'edit') {
         openGoalModal(goal);
     } else if (btn.dataset.action === 'delete') {
-        if (confirm(`Delete "${goal.name}"?`)) {
+        if (confirm(t('Delete "{name}"?', { name: goal.name }))) {
             goals.splice(goals.indexOf(goal), 1);
             saveGoals();
             renderGoals();
@@ -687,7 +681,7 @@ function renderSubs() {
     const summary = document.getElementById('subSummary');
 
     if (subs.length === 0) {
-        list.innerHTML = '<p class="empty">No subscriptions yet.</p>';
+        list.innerHTML = `<p class="empty">${t('No subscriptions yet.')}</p>`;
         summary.innerHTML = '';
         return;
     }
@@ -697,7 +691,7 @@ function renderSubs() {
             <span class="tx__icon tx__icon--letter">${escapeHtml(s.name.charAt(0).toUpperCase())}</span>
             <div class="tx__info">
                 <p class="tx__title">${escapeHtml(s.name)}</p>
-                <p class="tx__meta">Monthly</p>
+                <p class="tx__meta">${t('Monthly')}</p>
             </div>
             <span class="tx__amount">${formatMoney(s.amount)}</span>
             <div class="tx__actions">
@@ -712,17 +706,17 @@ function renderSubs() {
     summary.innerHTML = `
         <div class="overview__stats">
             <div class="stat">
-                <span class="stat__label">Monthly total</span>
+                <span class="stat__label">${t('Monthly total')}</span>
                 <span class="stat__value">${formatMoney(monthly)}</span>
             </div>
             <div class="stat">
-                <span class="stat__label">Yearly</span>
+                <span class="stat__label">${t('Yearly')}</span>
                 <span class="stat__value">${formatMoney(yearly)}</span>
             </div>
         </div>
         <div class="insight">
             <span class="insight__icon">⚠️</span>
-            <p class="insight__text">You're spending ${formatMoney(yearly)} per year on subscriptions.</p>
+            <p class="insight__text">${t("You're spending {amount} per year on subscriptions.", { amount: formatMoney(yearly) })}</p>
         </div>`;
 }
 
@@ -735,7 +729,7 @@ function openSubModal(sub) {
     subForm.reset();
     editingSubId = sub ? sub.id : null;
 
-    document.getElementById('subModalTitle').textContent = sub ? 'Edit Subscription' : 'Add Subscription';
+    document.getElementById('subModalTitle').textContent = sub ? t('Edit Subscription') : t('Add Subscription');
     document.getElementById('subName').value = sub ? sub.name : '';
     document.getElementById('subAmount').value = sub ? sub.amount : '';
 
@@ -781,7 +775,7 @@ document.getElementById('subList').addEventListener('click', (e) => {
 
     if (btn.dataset.action === 'edit') {
         openSubModal(sub);
-    } else if (confirm(`Delete "${sub.name}"?`)) {
+    } else if (confirm(t('Delete "{name}"?', { name: sub.name }))) {
         subs.splice(subs.indexOf(sub), 1);
         saveSubs();
         renderSubs();
@@ -804,7 +798,7 @@ function buildInsights() {
     const monthExpenses = expenses.filter(e => e.date.startsWith(thisMonth));
     const insights = [];
 
-    // 1. Категорија со најголем пораст во однос на минатиот месец
+    // 1. Категорија со најголем пораст
     const risers = data.categories
         .filter(c => c.previous > 0 && c.amount > c.previous)
         .sort((a, b) => (b.amount - b.previous) - (a.amount - a.previous));
@@ -815,8 +809,10 @@ function buildInsights() {
         const pct = Math.round((diff / c.previous) * 100);
         insights.push({
             icon: c.icon,
-            title: `${c.name} increased`,
-            text: `You spent ${formatMoney(diff)} more on ${c.name.toLowerCase()} than last month (+${pct}%).`
+            title: t('{cat} increased', { cat: t(c.name) }),
+            text: t('You spent {amount} more on {cat} than last month (+{pct}%).', {
+                amount: formatMoney(diff), cat: t(c.name).toLowerCase(), pct
+            })
         });
     }
 
@@ -825,8 +821,11 @@ function buildInsights() {
         const monthly = subs.reduce((sum, s) => sum + s.amount, 0);
         insights.push({
             icon: '📱',
-            title: 'Subscriptions',
-            text: `You pay for ${subs.length} subscription${subs.length === 1 ? '' : 's'}, ${formatMoney(monthly)} every month.`
+            title: t('Subscriptions'),
+            text: t(subs.length === 1
+                    ? 'You pay for 1 subscription, {amount} every month.'
+                    : 'You pay for {n} subscriptions, {amount} every month.',
+                { n: subs.length, amount: formatMoney(monthly) })
         });
     }
 
@@ -836,12 +835,14 @@ function buildInsights() {
         const label = big.description ? ` (${escapeHtml(big.description)})` : '';
         insights.push({
             icon: '💸',
-            title: 'Biggest expense',
-            text: `Your biggest expense was ${formatMoney(big.amount)} for ${big.category}${label}.`
+            title: t('Biggest expense'),
+            text: t('Your biggest expense was {amount} for {cat}{label}.', {
+                amount: formatMoney(big.amount), cat: t(big.category), label
+            })
         });
     }
 
-    // 4. Викенд vs работни денови (просек по ден, не збир)
+    // 4. Викенд vs работни денови
     let weekendDays = 0, weekdayDays = 0, weekendSum = 0, weekdaySum = 0;
 
     for (let d = 1; d <= now.getDate(); d++) {
@@ -862,8 +863,11 @@ function buildInsights() {
         if (pct >= 10) {
             insights.push({
                 icon: '📅',
-                title: 'Weekend spending',
-                text: `You spend ${pct}% ${ratio > 1 ? 'more' : 'less'} per day on weekends than on weekdays.`
+                title: t('Weekend spending'),
+                text: t(ratio > 1
+                        ? 'You spend {pct}% more per day on weekends than on weekdays.'
+                        : 'You spend {pct}% less per day on weekends than on weekdays.',
+                    { pct })
             });
         }
     }
@@ -874,8 +878,10 @@ function buildInsights() {
         const smallTotal = small.reduce((sum, e) => sum + e.amount, 0);
         insights.push({
             icon: '🪙',
-            title: 'Small expenses',
-            text: `You made ${small.length} purchases under ${formatMoney(10)} this month, ${formatMoney(smallTotal)} in total.`
+            title: t('Small expenses'),
+            text: t('You made {n} purchases under {limit} this month, {amount} in total.', {
+                n: small.length, limit: formatMoney(10), amount: formatMoney(smallTotal)
+            })
         });
     }
 
@@ -887,7 +893,7 @@ function renderInsights() {
     const box = document.getElementById('insightList');
 
     if (list.length === 0) {
-        box.innerHTML = '<p class="empty">Add a few expenses and your insights will show up here.</p>';
+        box.innerHTML = `<p class="empty">${t('Add a few expenses and your insights will show up here.')}</p>`;
         return;
     }
 
@@ -915,7 +921,7 @@ function getBuckets(period) {
             const d = new Date(y, m, now.getDate() - (6 - i));
             const iso = toISODate(d);
             return {
-                label: d.toLocaleDateString('en-US', { weekday: 'short' }),
+                label: d.toLocaleDateString(locale(), { weekday: 'short' }),
                 test: date => date === iso,
                 current: i === 6
             };
@@ -927,7 +933,7 @@ function getBuckets(period) {
         const weeks = Math.ceil(new Date(y, m + 1, 0).getDate() / 7);
         const currentWeek = Math.ceil(now.getDate() / 7);
         return Array.from({ length: weeks }, (_, i) => ({
-            label: 'W' + (i + 1),
+            label: t('W') + (i + 1),
             test: date => date.startsWith(key) && Math.ceil(Number(date.slice(8, 10)) / 7) === i + 1,
             current: i + 1 === currentWeek
         }));
@@ -936,7 +942,7 @@ function getBuckets(period) {
     return Array.from({ length: 12 }, (_, i) => {
         const key = `${y}-${String(i + 1).padStart(2, '0')}`;
         return {
-            label: new Date(y, i, 1).toLocaleDateString('en-US', { month: 'short' }),
+            label: new Date(y, i, 1).toLocaleDateString(locale(), { month: 'short' }),
             test: date => date.startsWith(key),
             current: i === m
         };
@@ -960,8 +966,8 @@ function renderAnalytics() {
 
     document.getElementById('anTotal').textContent = formatMoney(total);
     document.getElementById('anPeriod').textContent = {
-        week: 'last 7 days',
-        month: now.toLocaleString('en-US', { month: 'long', year: 'numeric' }),
+        week: t('last 7 days'),
+        month: monthTitle(now),
         year: String(now.getFullYear())
     }[analyticsPeriod];
 
@@ -969,7 +975,7 @@ function renderAnalytics() {
     const top = document.getElementById('anTop');
 
     if (total === 0) {
-        chart.innerHTML = '<p class="empty">No expenses in this period.</p>';
+        chart.innerHTML = `<p class="empty">${t('No expenses in this period.')}</p>`;
         top.innerHTML = '';
         return;
     }
@@ -1002,7 +1008,7 @@ function renderAnalytics() {
     top.innerHTML = cats.map(c => `
         <div class="budget-row">
             <div class="budget-row__top">
-                <span class="budget-row__name">${c.icon} ${c.name}</span>
+                <span class="budget-row__name">${c.icon} ${t(c.name)}</span>
                 <span class="budget-row__nums"><strong>${formatMoney(c.amount)}</strong> · ${Math.round((c.amount / total) * 100)}%</span>
             </div>
             <div class="progress progress--thin">
@@ -1025,7 +1031,7 @@ const CURRENCIES = { EUR: '€', USD: '$', GBP: '£', MKD: 'ден' };
 const isFirstRun = localStorage.getItem('settings') === null;
 
 function loadSettings() {
-    const fallback = { name: '', income: 0, currency: 'EUR' };
+    const fallback = { name: '', income: 0, currency: 'EUR', language: detectLanguage() };
     try {
         return { ...fallback, ...JSON.parse(localStorage.getItem('settings')) };
     } catch {
@@ -1038,6 +1044,7 @@ function saveSettings() {
 }
 
 const settings = loadSettings();
+setLanguage(settings.language);
 
 function currencySymbol() {
     return CURRENCIES[settings.currency] || '€';
@@ -1065,6 +1072,7 @@ function openSettingsModal() {
     document.getElementById('settingsName').value = settings.name;
     document.getElementById('settingsIncome').value = settings.income || '';
     document.getElementById('settingsCurrency').value = settings.currency;
+    document.getElementById('settingsLanguage').value = settings.language;
     applyCurrencySymbols();
     settingsModal.classList.add('modal--open');
 }
@@ -1086,15 +1094,14 @@ settingsForm.addEventListener('submit', (e) => {
     settings.name = document.getElementById('settingsName').value.trim();
     settings.income = parseFloat(document.getElementById('settingsIncome').value) || 0;
     settings.currency = document.getElementById('settingsCurrency').value;
+    settings.language = document.getElementById('settingsLanguage').value;
 
     saveSettings();
     applyCurrencySymbols();
     closeSettingsModal();
 
     // валутата се користи насекаде, па прецртуваме сè
-    refresh();
-    renderGoals();
-    renderSubs();
+    applyLanguage();
 });
 
 // ---- Export CSV ----
@@ -1126,7 +1133,7 @@ function exportCSV() {
 
 document.getElementById('exportCsv').addEventListener('click', () => {
     if (expenses.length === 0) {
-        alert('Nothing to export yet.');
+        alert(t('Nothing to export yet.'));
         return;
     }
     exportCSV();
@@ -1134,7 +1141,7 @@ document.getElementById('exportCsv').addEventListener('click', () => {
 
 // ---- Delete all data ----
 document.getElementById('deleteAll').addEventListener('click', () => {
-    if (confirm('Delete ALL your data? This cannot be undone.')) {
+    if (confirm(t('Delete ALL your data? This cannot be undone.'))) {
         localStorage.clear();
         location.reload();
     }
@@ -1176,8 +1183,8 @@ function renderReview() {
     const now = new Date();
     const date = new Date(now.getFullYear(), now.getMonth() + reviewOffset, 1);
     const prevDate = new Date(now.getFullYear(), now.getMonth() + reviewOffset - 1, 1);
-    const monthName = date.toLocaleString('en-US', { month: 'long' });
-    const prevName = prevDate.toLocaleString('en-US', { month: 'long' });
+    const monthName = getMonthName(date);
+    const prevName = getMonthName(prevDate);
 
     const cur = monthStats(monthKey(date));
     const prev = monthStats(monthKey(prevDate));
@@ -1187,14 +1194,14 @@ function renderReview() {
         ? expenses.reduce((min, e) => (e.date < min ? e.date : min), expenses[0].date).slice(0, 7)
         : null;
 
-    document.getElementById('reviewTitle').textContent = `${monthName} ${date.getFullYear()}`;
+    document.getElementById('reviewTitle').textContent = monthTitle(date);
     document.getElementById('reviewPrev').disabled = !earliest || monthKey(date) <= earliest;
     document.getElementById('reviewNext').disabled = reviewOffset >= 0;
 
     const box = document.getElementById('reviewBody');
 
     if (cur.count === 0) {
-        box.innerHTML = `<p class="empty">No expenses in ${monthName}.</p>`;
+        box.innerHTML = `<p class="empty">${t('No expenses in {month}.', { month: monthName })}</p>`;
         return;
     }
 
@@ -1207,20 +1214,20 @@ function renderReview() {
     const topCat = CATEGORIES.find(c => c.name === topName);
     const big = cur.biggest;
     const bigCat = CATEGORIES.find(c => c.name === big.category);
-    const bigLabel = big.description ? escapeHtml(big.description) : big.category;
+    const bigLabel = big.description ? escapeHtml(big.description) : t(big.category);
 
     // споредба со претходниот месец
-    const rows = [['📊 Spending', cur.total, prev.total]];
+    const rows = [[t('📊 Spending'), cur.total, prev.total]];
     Object.entries(cur.byCat)
         .sort((a, b) => b[1] - a[1])
         .slice(0, 4)
         .forEach(([name, amount]) => {
             const cat = CATEGORIES.find(c => c.name === name);
-            rows.push([`${cat ? cat.icon : '💰'} ${name}`, amount, prev.byCat[name] || 0]);
+            rows.push([`${cat ? cat.icon : '💰'} ${t(name)}`, amount, prev.byCat[name] || 0]);
         });
 
     const compare = prev.count === 0
-        ? `<p class="empty">No data for ${prevName} to compare.</p>`
+        ? `<p class="empty">${t('No data for {month} to compare.', { month: prevName })}</p>`
         : rows.map(([label, a, b]) => `
             <div class="fact-row">
                 <span>${label}</span>
@@ -1230,17 +1237,17 @@ function renderReview() {
     // стапка на штедење
     let savings;
     if (rate === null) {
-        savings = '<p class="empty">Set your monthly income in Settings to see your savings rate.</p>';
+        savings = `<p class="empty">${t('Set your monthly income in Settings to see your savings rate.')}</p>`;
     } else {
         const barWidth = Math.max(0, Math.min(100, rate));
         const text = saved >= 0
-            ? `You saved ${formatMoney(saved)} in ${monthName}.`
-            : `You spent ${formatMoney(-saved)} more than your income in ${monthName}.`;
+            ? t('You saved {amount} in {month}.', { amount: formatMoney(saved), month: monthName })
+            : t('You spent {amount} more than your income in {month}.', { amount: formatMoney(-saved), month: monthName });
 
         savings = `
             <div class="rate">
                 <span class="rate__value ${saved >= 0 ? 'text-income' : 'text-spent'}">${rate.toFixed(1)}%</span>
-                <span class="rate__label">savings rate</span>
+                <span class="rate__label">${t('savings rate')}</span>
             </div>
             <div class="progress">
                 <div class="progress__bar progress__bar--goal" style="width:${barWidth}%"></div>
@@ -1252,27 +1259,27 @@ function renderReview() {
         <div class="context__grid">
             <div class="context__item">
                 <span class="context__value">${formatMoney(income)}</span>
-                <span class="context__label">Income</span>
+                <span class="context__label">${t('Income')}</span>
             </div>
             <div class="context__item">
                 <span class="context__value text-spent">${formatMoney(cur.total)}</span>
-                <span class="context__label">Spent</span>
+                <span class="context__label">${t('Spent')}</span>
             </div>
             <div class="context__item">
                 <span class="context__value ${saved >= 0 ? 'text-income' : 'text-spent'}">${formatMoney(saved)}</span>
-                <span class="context__label">Saved</span>
+                <span class="context__label">${t('Saved')}</span>
             </div>
         </div>
 
-        <p class="review__line">Your biggest category
-            <strong>${topCat ? topCat.icon : '💰'} ${topName} — ${formatMoney(topAmount)}</strong></p>
-        <p class="review__line">Your biggest expense
+        <p class="review__line">${t('Your biggest category')}
+            <strong>${topCat ? topCat.icon : '💰'} ${t(topName)} — ${formatMoney(topAmount)}</strong></p>
+        <p class="review__line">${t('Your biggest expense')}
             <strong>${bigCat ? bigCat.icon : '💰'} ${bigLabel} — ${formatMoney(big.amount)}</strong></p>
 
-        <h4 class="subtitle review__block">Compared to ${prevName}</h4>
+        <h4 class="subtitle review__block">${t('Compared to {month}', { month: prevName })}</h4>
         ${compare}
 
-        <h4 class="subtitle review__block">⭐ Your month</h4>
+        <h4 class="subtitle review__block">${t('⭐ Your month')}</h4>
         ${savings}`;
 }
 
@@ -1292,15 +1299,15 @@ function renderAfford() {
     const price = parseFloat(document.getElementById('affordPrice').value);
 
     if (!(price > 0)) {
-        box.innerHTML = '<p class="empty">Enter a price to see what it would do to your month.</p>';
+        box.innerHTML = `<p class="empty">${t('Enter a price to see what it would do to your month.')}</p>`;
         return;
     }
     if (price > MAX_AMOUNT) {
-        box.innerHTML = `<p class="empty">Maximum amount is ${formatMoney(MAX_AMOUNT)}.</p>`;
+        box.innerHTML = `<p class="empty">${t('Maximum amount is {amount}.', { amount: formatMoney(MAX_AMOUNT) })}</p>`;
         return;
     }
     if (settings.income <= 0) {
-        box.innerHTML = '<p class="empty">Set your monthly income in Settings first.</p>';
+        box.innerHTML = `<p class="empty">${t('Set your monthly income in Settings first.')}</p>`;
         return;
     }
 
@@ -1310,11 +1317,11 @@ function renderAfford() {
 
     let summary;
     if (remaining <= 0) {
-        summary = 'You have no money left this month, so this purchase would go over your income.';
+        summary = t('You have no money left this month, so this purchase would go over your income.');
     } else if (price > remaining) {
-        summary = `This is ${formatMoney(price - remaining)} more than what you have left this month.`;
+        summary = t('This is {amount} more than what you have left this month.', { amount: formatMoney(price - remaining) });
     } else {
-        summary = `This purchase would use ${Math.round((price / remaining) * 100)}% of your remaining money.`;
+        summary = t('This purchase would use {pct}% of your remaining money.', { pct: Math.round((price / remaining) * 100) });
     }
 
     // ред за буџет (само ако има поставен општ буџет)
@@ -1323,7 +1330,7 @@ function renderAfford() {
         const budgetAfter = budgets.overall - data.spent - price;
         budgetRow = `
             <div class="fact-row">
-                <span>${budgetAfter >= 0 ? 'Budget left after' : 'Over budget by'}</span>
+                <span>${budgetAfter >= 0 ? t('Budget left after') : t('Over budget by')}</span>
                 <span class="fact-row__value ${budgetAfter >= 0 ? '' : 'text-spent'}">${formatMoney(Math.abs(budgetAfter))}</span>
             </div>`;
     }
@@ -1331,15 +1338,15 @@ function renderAfford() {
     box.innerHTML = `
         <div class="afford__result">
             <div class="fact-row">
-                <span>Current balance</span>
+                <span>${t('Current balance')}</span>
                 <span class="fact-row__value">${formatMoney(remaining)}</span>
             </div>
             <div class="fact-row">
-                <span>After purchase</span>
+               <span>${t('After purchase')}</span>
                 <span class="fact-row__value ${after >= 0 ? '' : 'text-spent'}">${formatMoney(after)}</span>
             </div>
             <div class="fact-row">
-                <span>Share of monthly income</span>
+                <span>${t('Share of monthly income')}</span>
                 <span class="fact-row__value">${incomePct}%</span>
             </div>
             ${budgetRow}
@@ -1357,9 +1364,6 @@ let searchQuery = '';
 let filterCategory = 'all';
 
 const filterSelect = document.getElementById('filterSelect');
-filterSelect.innerHTML =
-    '<option value="all">All categories</option>' +
-    CATEGORIES.map(c => `<option value="${c.name}">${c.icon} ${c.name}</option>`).join('');
 
 // опишот го внесува корисникот, па го "чистиме" пред да го ставиме во HTML
 function escapeHtml(text) {
@@ -1371,9 +1375,9 @@ function escapeHtml(text) {
 function dayLabel(iso) {
     const today = new Date();
     const yesterday = new Date(today.getFullYear(), today.getMonth(), today.getDate() - 1);
-    if (iso === toISODate(today)) return 'Today';
-    if (iso === toISODate(yesterday)) return 'Yesterday';
-    return new Date(iso + 'T00:00:00').toLocaleDateString('en-GB', {
+    if (iso === toISODate(today)) return t('Today');
+    if (iso === toISODate(yesterday)) return t('Yesterday');
+    return new Date(iso + 'T00:00:00').toLocaleDateString(locale(), {   // беше 'en-GB'
         day: 'numeric', month: 'short', year: 'numeric'
     });
 }
@@ -1393,7 +1397,7 @@ function renderTransactions() {
     const box = document.getElementById('txList');
 
     if (list.length === 0) {
-        box.innerHTML = '<p class="empty">No transactions found.</p>';
+        box.innerHTML = `<p class="empty">${t('No transactions found.')}</p>`;
         return;
     }
 
@@ -1410,14 +1414,14 @@ function renderTransactions() {
         const rows = items.map(e => {
             const cat = CATEGORIES.find(c => c.name === e.category)
                 || { icon: '💰', color: '#94a3b8' };
-            const title = e.description ? escapeHtml(e.description) : e.category;
+            const title = e.description ? escapeHtml(e.description) : t(e.category);
 
             return `
                 <div class="tx">
                     <span class="tx__icon" style="background:${cat.color}22">${cat.icon}</span>
                     <div class="tx__info">
                         <p class="tx__title">${title}</p>
-                        <p class="tx__meta">${e.category} • ${e.payment}</p>
+                        <p class="tx__meta">${t(e.category)} • ${t(e.payment)}</p>
                     </div>
                     <span class="tx__amount">-${formatMoney(e.amount)}</span>
                     <div class="tx__actions">
@@ -1459,11 +1463,11 @@ document.getElementById('txList').addEventListener('click', (e) => {
 
     if (btn.dataset.action === 'edit') {
         openModal(expense);
-    } else if (confirm('Delete this expense?')) {
+    } else if (confirm(t('Delete this expense?'))) {
         expenses.splice(expenses.indexOf(expense), 1);
         saveExpenses();
         refresh();
-        showToast('Expense deleted');
+        showToast(t('Expense deleted'));
     }
 });
 
@@ -1482,6 +1486,39 @@ themeToggle.addEventListener('click', () => {
     const current = document.documentElement.getAttribute('data-theme');
     applyTheme(current === 'dark' ? 'light' : 'dark');
 });
+
+// ============ ЈАЗИК: листи и прецртување ============
+// селектите и полињата за буџет се градат со преведени имиња на категории
+function buildLists() {
+    const catValue = categorySelect.value;
+    const filterValue = filterSelect.value;
+    const options = CATEGORIES
+        .map(c => `<option value="${c.name}">${c.icon} ${t(c.name)}</option>`)
+        .join('');
+
+    categorySelect.innerHTML = options;
+    categorySelect.value = catValue || CATEGORIES[0].name;
+
+    filterSelect.innerHTML = `<option value="all">${t('All categories')}</option>` + options;
+    filterSelect.value = filterValue || 'all';
+
+    document.getElementById('budgetFields').innerHTML = CATEGORIES.map(c => `
+        <label class="budget-field">
+            <span class="budget-field__name">${c.icon} ${t(c.name)}</span>
+            <input type="number" class="input" data-cat="${c.name}"
+                   placeholder="—" step="1" min="0" max="${MAX_AMOUNT}" inputmode="decimal">
+        </label>`).join('');
+}
+
+// менува јазик: статичниот текст, листите, па сè што се црта од податоци
+function applyLanguage() {
+    setLanguage(settings.language);
+    translateDom();   // мора ПРЕД refresh(), за да не се допираат веќе нацртаните листи
+    buildLists();
+    refresh();
+    renderGoals();
+    renderSubs();
+}
 
 // ============ МЕНИ ДОЛУ ============
 const navButtons = document.querySelectorAll('.nav-btn');
@@ -1541,8 +1578,6 @@ document.querySelectorAll('input[type="number"]').forEach(input => {
     input.max = MAX_AMOUNT;
 });
 applyCurrencySymbols();
-refresh();
-renderGoals();
-renderSubs();
+applyLanguage();
 if (isFirstRun) openSettingsModal();
 startApp();
