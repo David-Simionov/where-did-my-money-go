@@ -1,3 +1,5 @@
+
+
 // ============ ЛИМИТИ ============
 const MAX_AMOUNT = 1000000;   // најголем дозволен износ
 
@@ -13,6 +15,8 @@ const CATEGORIES = [
     { name: 'Health',        icon: '💊', color: '#ef4444' },
     { name: 'Education',     icon: '🎓', color: '#8b5cf6' },
     { name: 'Travel',        icon: '✈️', color: '#14b8a6' },
+    { name: 'Other',         icon: '💰', color: '#94a3b8' },
+    { name: 'Cash',          icon: '💵', color: '#64748b' },
     { name: 'Other',         icon: '💰', color: '#94a3b8' }
 ];
 
@@ -59,7 +63,7 @@ saveExpenses();
 
 // ============ ПРЕСМЕТКИ ============
 function recalcData() {
-    data.income = settings.income;
+    data.income = incomeFor(monthKey(new Date()));
     const now = new Date();
     const thisMonth = monthKey(now);
     const lastMonth = monthKey(new Date(now.getFullYear(), now.getMonth() - 1, 1));
@@ -158,12 +162,24 @@ function animateNumber(key, to, apply) {
 // ============ TOAST ============
 let toastTimer;
 
-function showToast(message) {
+function showToast(message, actionLabel, onAction) {
     const toast = document.getElementById('toast');
     toast.textContent = message;
+
+    if (actionLabel) {
+        const btn = document.createElement('button');
+        btn.className = 'toast__action';
+        btn.textContent = actionLabel;
+        btn.addEventListener('click', () => {
+            onAction();
+            toast.classList.remove('toast--show');
+        });
+        toast.append(btn);
+    }
+
     toast.classList.add('toast--show');
     clearTimeout(toastTimer);
-    toastTimer = setTimeout(() => toast.classList.remove('toast--show'), 2200);
+    toastTimer = setTimeout(() => toast.classList.remove('toast--show'), actionLabel ? 5000 : 2200);
 }
 
 // ============ DASHBOARD ============
@@ -241,6 +257,7 @@ let selectedIndex = 0;
 function renderContext() {
     if (data.categories.length === 0) {
         document.getElementById('chips').innerHTML = '';
+        updateChipFades();
         document.getElementById('ctxHeadline').textContent = t('No expenses yet. Tap + to add your first one.');
         ['ctxPerDay', 'ctxIncomePct', 'ctxTrend'].forEach(id => {
             document.getElementById(id).textContent = '—';
@@ -248,6 +265,7 @@ function renderContext() {
         document.getElementById('ctxTrend').className = 'context__value';
         document.getElementById('ctxTrendLabel').textContent = '';
         document.getElementById('ctxInsight').textContent = t('Add an expense and your insights will show up here.');
+        document.getElementById('tipsCard').hidden = true;
         return;
     }
 
@@ -255,10 +273,55 @@ function renderContext() {
     const c = data.categories[selectedIndex];
 
     // chips
-    document.getElementById('chips').innerHTML = data.categories.map((cat, i) => `
+    renderChips();
+
+    // ============ КАТЕГОРИИ: ЛИЗГАЊЕ ============
+    function updateChipFades() {
+        const box = document.getElementById('chips');
+        const wrap = document.getElementById('chipsWrap');
+        wrap.classList.toggle('chips-wrap--left', box.scrollLeft > 4);
+        wrap.classList.toggle('chips-wrap--right', box.scrollLeft + box.clientWidth < box.scrollWidth - 4);
+    }
+
+// избраната категорија секогаш се гледа цела
+    function scrollActiveChip(behavior = 'smooth') {
+        const box = document.getElementById('chips');
+        const active = box.querySelector('.chip--active');
+        if (!active || !box.clientWidth) return;   // скриен екран
+
+        const left = active.offsetLeft;
+        const right = left + active.offsetWidth;
+        const pad = 28;
+
+        if (left < box.scrollLeft + pad) box.scrollTo({ left: left - pad, behavior });
+        else if (right > box.scrollLeft + box.clientWidth - pad) box.scrollTo({ left: right - box.clientWidth + pad, behavior });
+    }
+
+    function renderChips() {
+        const box = document.getElementById('chips');
+        const keep = box.scrollLeft;   // не скокај на почеток при секое прецртување
+
+        box.innerHTML = data.categories.map((cat, i) => `
         <button class="chip ${i === selectedIndex ? 'chip--active' : ''}" data-index="${i}">
             ${cat.icon} ${t(cat.name)}
         </button>`).join('');
+
+        box.scrollLeft = keep;
+        scrollActiveChip();
+        updateChipFades();
+    }
+
+    document.getElementById('chips').addEventListener('scroll', updateChipFades, { passive: true });
+    window.addEventListener('resize', updateChipFades);
+
+    document.getElementById('chipsLeft').addEventListener('click', () => {
+        const box = document.getElementById('chips');
+        box.scrollBy({ left: -box.clientWidth * 0.7, behavior: 'smooth' });
+    });
+    document.getElementById('chipsRight').addEventListener('click', () => {
+        const box = document.getElementById('chips');
+        box.scrollBy({ left: box.clientWidth * 0.7, behavior: 'smooth' });
+    });
 
     // пресметки
     const daysPassed = new Date().getDate();
@@ -302,6 +365,7 @@ function renderContext() {
             { amount: formatMoney(Math.abs(diff)), cat: catLower });
     }
     document.getElementById('ctxInsight').textContent = insight;
+    renderTips();
 }
 
 // клик на chip (event delegation, се закачува само еднаш)
@@ -343,7 +407,7 @@ function closeModal() {
     modal.classList.remove('modal--open');
 }
 
-document.getElementById('openModal').addEventListener('click', () => openModal());
+document.getElementById('openModal').addEventListener('click', () => openQuick());
 document.getElementById('closeModal').addEventListener('click', closeModal);
 document.getElementById('modalBackdrop').addEventListener('click', closeModal);
 document.addEventListener('keydown', (e) => {
@@ -1208,7 +1272,7 @@ function renderReview() {
         return;
     }
 
-    const income = settings.income;
+    const income = incomeFor(monthKey(date));
     const saved = income - cur.total;
     const rate = income > 0 ? (saved / income) * 100 : null;
 
@@ -1309,7 +1373,7 @@ function renderAfford() {
         box.innerHTML = `<p class="empty">${t('Maximum amount is {amount}.', { amount: formatMoney(MAX_AMOUNT) })}</p>`;
         return;
     }
-    if (settings.income <= 0) {
+    if (data.income <= 0) {
         box.innerHTML = `<p class="empty">${t('Set your monthly income in Settings first.')}</p>`;
         return;
     }
@@ -1560,34 +1624,207 @@ window.addEventListener('appinstalled', () => { installBtn.hidden = true; });
 // iPhone нема автоматски прозорец, па покажуваме упатство
 if (isIOS && !isInstalled) iosHint.hidden = false;
 
-// ============ МЕНИ ДОЛУ ============
-const navButtons = document.querySelectorAll('.nav-btn');
+// ============ СОВЕТИ ЗА ШТЕДЕЊЕ ============
+let savePct = 10;
 
-navButtons.forEach(btn => {
-    btn.addEventListener('click', () => {
-        document.getElementById(btn.dataset.target)
-            .scrollIntoView({ behavior: 'smooth', block: 'start' });
+function renderTips() {
+    const card = document.getElementById('tipsCard');
+    const c = data.categories[selectedIndex];
+    const tips = c && TIPS[c.name];
+
+    card.hidden = !tips;
+    if (!tips) return;
+
+    const list = tips[currentLang] || tips.en;
+
+    // "типичен месец": ако овој месец допрва почнал, се користи поголемиот од двата
+    const base = Math.max(c.amount, c.previous);
+    const monthly = Math.round(base * savePct) / 100;
+    const yearly = Math.round(monthly * 12 * 100) / 100;
+
+    // колку месеци до првата недовршена цел
+    const goal = goals.find(g => g.saved < g.target);
+    let goalLine = '';
+    if (goal && monthly > 0) {
+        const months = Math.ceil((goal.target - goal.saved) / monthly);
+        if (months <= 120) {
+            goalLine = `<p class="save-box__line">${t(months === 1
+                    ? 'That would complete your goal "{name}" in 1 month.'
+                    : 'That would complete your goal "{name}" in {n} months.',
+                { name: escapeHtml(goal.name), n: months })}</p>`;
+        }
+    }
+
+    document.getElementById('tipsTitle').textContent = t('Savings tips: {cat}', { cat: t(c.name) });
+
+    document.getElementById('tipsBody').innerHTML = `
+        <ol class="tips__list">
+            ${list.map((text, i) => `
+                <li class="tip"><span class="tip__n">${i + 1}</span><span>${text}</span></li>`).join('')}
+        </ol>
+
+        <div class="save-box">
+            <p class="save-box__title">${t('What if you spend less?')}</p>
+            <div class="save-pcts">
+                ${[10, 20, 30].map(p => `
+                    <button class="chip ${p === savePct ? 'chip--active' : ''}" data-pct="${p}">-${p}%</button>`).join('')}
+            </div>
+            <p class="save-box__big">${t('You would save {amount} per month.', { amount: formatMoney(monthly) })}</p>
+            <p class="save-box__line">${t('That is {amount} per year.', { amount: formatMoney(yearly) })}</p>
+            ${goalLine}
+            <p class="save-box__small">${t('Based on a typical month: {amount} on {cat}.', {
+        amount: formatMoney(base), cat: t(c.name).toLowerCase()
+    })}</p>
+        </div>
+
+        <p class="tips__note">${t('General ideas, not financial advice.')}</p>`;
+}
+
+document.getElementById('tipsBody').addEventListener('click', (e) => {
+    const btn = e.target.closest('[data-pct]');
+    if (!btn) return;
+    savePct = Number(btn.dataset.pct);
+    renderTips();
+});
+
+// ============ ДОПОЛНИТЕЛЕН ПРИХОД ============
+function loadIncomes() {
+    try {
+        const list = JSON.parse(localStorage.getItem('incomes'));
+        return Array.isArray(list)
+            ? list.filter(x => x && x.id && x.amount > 0 && typeof x.date === 'string')
+            : [];
+    } catch {
+        return [];
+    }
+}
+
+function saveIncomes() {
+    localStorage.setItem('incomes', JSON.stringify(incomes));
+}
+
+const incomes = loadIncomes();
+
+// основен месечен приход + дополнителните за тој месец (key = "2026-10")
+function incomeFor(key) {
+    const extra = incomes
+        .filter(x => x.date.startsWith(key))
+        .reduce((sum, x) => sum + x.amount, 0);
+    return Math.round((settings.income + extra) * 100) / 100;
+}
+
+const incomeModal = document.getElementById('incomeModal');
+const incomeForm = document.getElementById('incomeForm');
+
+function renderIncomeList() {
+    const key = monthKey(new Date());
+    const list = incomes
+        .filter(x => x.date.startsWith(key))
+        .sort((a, b) => b.date.localeCompare(a.date));
+
+    document.getElementById('incomeListBox').hidden = list.length === 0;
+    document.getElementById('incomeList').innerHTML = '<div class="tx-group">' + list.map(x => `
+        <div class="tx">
+            <span class="tx__icon" style="background:#10b98122">💵</span>
+            <div class="tx__info">
+                <p class="tx__title">${x.description ? escapeHtml(x.description) : t('Extra income')}</p>
+                <p class="tx__meta">${dayLabel(x.date)}</p>
+            </div>
+            <span class="tx__amount text-income">+${formatMoney(x.amount)}</span>
+            <div class="tx__actions">
+                <button type="button" class="tx__btn" data-id="${x.id}" aria-label="Delete">🗑</button>
+            </div>
+        </div>`).join('') + '</div>';
+}
+
+function openIncomeModal() {
+    const today = toISODate(new Date());
+    incomeForm.reset();
+    document.getElementById('incomeDate').value = today;
+    document.getElementById('incomeDate').min = today.slice(0, 7) + '-01';   // само тековен месец
+    document.getElementById('incomeDate').max = today;
+    renderIncomeList();
+    incomeModal.classList.add('modal--open');
+    document.getElementById('incomeAmount').focus();
+}
+
+function closeIncomeModal() {
+    incomeModal.classList.remove('modal--open');
+}
+
+document.getElementById('addIncomeBtn').addEventListener('click', openIncomeModal);
+document.getElementById('closeIncome').addEventListener('click', closeIncomeModal);
+document.getElementById('incomeBackdrop').addEventListener('click', closeIncomeModal);
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeIncomeModal(); });
+
+incomeForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+
+    const amount = Math.round(parseFloat(document.getElementById('incomeAmount').value) * 100) / 100;
+    const date = document.getElementById('incomeDate').value;
+    const today = toISODate(new Date());
+
+    if (!(amount > 0) || amount > MAX_AMOUNT) return;
+    if (!date || date > today || date.slice(0, 7) !== today.slice(0, 7)) return;
+
+    const item = {
+        id: newId(),
+        amount,
+        description: document.getElementById('incomeDesc').value.trim(),
+        date
+    };
+
+    incomes.push(item);
+    saveIncomes();
+    closeIncomeModal();
+    refresh();
+
+    showToast(t('Income added ✓'), t('Undo'), () => {
+        const i = incomes.findIndex(x => x.id === item.id);
+        if (i !== -1) incomes.splice(i, 1);
+        saveIncomes();
+        refresh();
     });
 });
 
-// активното копче се менува според тоа што е на екранот
-const sectionObserver = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-        if (!entry.isIntersecting) return;
-        navButtons.forEach(b =>
-            b.classList.toggle('nav-btn--active', b.dataset.target === entry.target.id));
-    });
-}, { rootMargin: '-40% 0px -55% 0px' });
+document.getElementById('incomeList').addEventListener('click', (e) => {
+    const btn = e.target.closest('.tx__btn');
+    if (!btn) return;
 
-navButtons.forEach(b => sectionObserver.observe(document.getElementById(b.dataset.target)));
+    const i = incomes.findIndex(x => x.id === btn.dataset.id);
+    if (i === -1 || !confirm(t('Delete this income?'))) return;
+
+    incomes.splice(i, 1);
+    saveIncomes();
+    refresh();
+    renderIncomeList();
+});
+
+// ============ МЕНИ ДОЛУ (екрани) ============
+const navButtons = document.querySelectorAll('.nav-btn');
+
+function showPage(name) {
+    document.querySelectorAll('.page').forEach(p => {
+        p.classList.toggle('page--active', p.id === 'page-' + name);
+    });
+    navButtons.forEach(b => b.classList.toggle('nav-btn--active', b.dataset.page === name));
+
+    window.scrollTo({ top: 0 });
+    scrollActiveChip('auto');   // мерките постојат дури кога екранот е видлив
+    updateChipFades();
+}
+
+navButtons.forEach(b => b.addEventListener('click', () => showPage(b.dataset.page)));
 
 function startApp() {
     const splash = document.getElementById('splash');
     const skip = document.documentElement.classList.contains('no-splash') || reduceMotion;
 
     // картичките влегуваат една по една
-    document.querySelectorAll('.main .card').forEach((card, i) => {
-        card.style.setProperty('--i', Math.min(i, 8));
+    document.querySelectorAll('.page').forEach(page => {
+        page.querySelectorAll('.card').forEach((card, i) => {
+            card.style.setProperty('--i', Math.min(i, 4));
+        });
     });
 
     const reveal = () => {

@@ -196,7 +196,55 @@ const DICT = {
         'Other': 'Друго',
 
         'Install app': 'Инсталирај ја апликацијата',
-        'On iPhone: tap the Share button, then "Add to Home Screen".': 'На iPhone: допри го копчето за споделување, па „Add to Home Screen“.'
+        'On iPhone: tap the Share button, then "Add to Home Screen".': 'На iPhone: допри го копчето за споделување, па „Add to Home Screen“.',
+
+        // Брзо внесување
+        'Quick add': 'Брзо додавање',
+        'What for? (optional)': 'За што? (по избор)',
+        'More options': 'Повеќе опции',
+        'Repeat every month': 'Повторувај секој месец',
+        'Add {amount}': 'Додај {amount}',
+        'Undo': 'Врати',
+        'Added. Repeats every month ✓': 'Додадено. Се повторува секој месец ✓',
+        'Recurring expenses': 'Повторливи трошоци',
+        'Every month (day {n})': 'Секој месец (ден {n})',
+        'Stop this recurring expense?': 'Да го запрам овој повторлив трошок?',
+        'Recurring expenses added: {n}': 'Додадени повторливи трошоци: {n}',
+
+        'Savings tips: {cat}': 'Совети за штедење: {cat}',
+        'What if you spend less?': 'Што ако трошиш помалку?',
+        'You would save {amount} per month.': 'Би заштедил {amount} месечно.',
+        'That is {amount} per year.': 'Тоа се {amount} годишно.',
+        'That would complete your goal "{name}" in 1 month.': 'Така би ја постигнал целта „{name}“ за 1 месец.',
+        'That would complete your goal "{name}" in {n} months.': 'Така би ја постигнал целта „{name}“ за {n} месеци.',
+        'Based on a typical month: {amount} on {cat}.': 'Врз основа на типичен месец: {amount} за {cat}.',
+        'General ideas, not financial advice.': 'Општи идеи, не финансиски совет.',
+
+        // Резервна копија
+        'Back up data': 'Направи резервна копија',
+        'Restore from backup': 'Врати од резервна копија',
+        'Last backup: {date}': 'Последна копија: {date}',
+        'No backup yet. Your data lives only on this device.': 'Сè уште нема резервна копија. Податоците ти се само на овој уред.',
+        'Backup saved ✓': 'Копијата е зачувана ✓',
+        'Backup restored ✓': 'Копијата е вратена ✓',
+        'This is not a valid backup file.': 'Ова не е валидна датотека за резервна копија.',
+        'This backup was made by a newer version of the app.': 'Копијата е направена со понова верзија на апликацијата.',
+        'This backup file is too large.': 'Датотеката со копија е премногу голема.',
+        'Could not restore the backup.': 'Копијата не може да се врати.',
+        'Restore backup from {date}? It has {n} expenses. This replaces your current data ({m} expenses).': 'Да ја вратам копијата од {date}? Содржи {n} трошоци. Ова ги заменува твоите тековни податоци ({m} трошоци).',
+        '{n} invalid entries will be skipped.': '{n} невалидни ставки ќе бидат прескокнати.',
+
+        // Приход и екрани
+        'Extra income': 'Дополнителен приход',
+        'Add income': 'Додај приход',
+        'Extra income this month': 'Дополнителни приходи овој месец',
+        'Gift': 'Подарок',
+        'Income added ✓': 'Приходот е додаден ✓',
+        'Delete this income?': 'Да го избришам овој приход?',
+        'Your regular monthly income. For one-time extra income, use + next to Income on the home screen.': 'Твојот редовен месечен приход. За еднократен дополнителен приход користи + покрај „Приход“ на почетната.',
+        'Plan': 'План',
+        'Previous': 'Претходно',
+        'Next': 'Следно'
     }
 };
 

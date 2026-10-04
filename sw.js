@@ -1,7 +1,8 @@
-const CACHE = 'money-v1';   // ако некогаш сакаш да го исчистиш кешот кај сите, смени го бројот
+const CACHE = 'money-v5';
 
 const SHELL = [
-    './', 'index.html', 'css/style.css', 'js/i18n.js', 'js/app.js',
+    './', 'index.html', 'css/style.css',
+    'js/i18n.js', 'js/tips.js', 'js/app.js', 'js/quick.js', 'js/backup.js',
     'manifest.json', 'icons/icon-192.png', 'icons/icon-512.png', 'icons/apple-touch-icon.png'
 ];
 

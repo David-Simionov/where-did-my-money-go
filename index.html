@@ -75,161 +75,179 @@
   <!-- ПРЕГЛЕД НА ПАРИТЕ -->
   <main class="main">
 
-    <section class="month-bar">
-      <h2 class="month-bar__label" id="monthLabel">September 2026</h2>
-    </section>
+    <div class="page page--active" id="page-home">
+      <section class="month-bar">
+        <h2 class="month-bar__label" id="monthLabel">September 2026</h2>
+      </section>
 
-    <section class="card overview" id="sec-home">
-      <p class="overview__label">Remaining</p>
-      <p class="overview__amount" id="remaining">€266.00</p>
+      <section class="card overview" id="sec-home">
+        <p class="overview__label">Remaining</p>
+        <p class="overview__amount" id="remaining">€266.00</p>
 
-      <div class="progress">
-        <div class="progress__bar" id="progressBar" style="width: 73%"></div>
-      </div>
-      <p class="progress__text"><span id="progressPercent">73%</span> of income spent</p>
-
-      <div class="overview__stats">
-        <div class="stat">
-          <span class="stat__label">Income</span>
-          <span class="stat__value stat__value--income" id="income">€1,000</span>
+        <div class="progress">
+          <div class="progress__bar" id="progressBar" style="width: 73%"></div>
         </div>
-        <div class="stat">
-          <span class="stat__label">Spent</span>
-          <span class="stat__value stat__value--spent" id="spent">€734</span>
+        <p class="progress__text"><span id="progressPercent">73%</span> of income spent</p>
+
+        <div class="overview__stats">
+          <div class="stat">
+            <span class="stat__label">Income <button type="button" class="mini-btn" id="addIncomeBtn" aria-label="Add income">+</button></span>
+            <span class="stat__value stat__value--income" id="income">€1,000</span>
+          </div>
+          <div class="stat">
+            <span class="stat__label">Spent</span>
+            <span class="stat__value stat__value--spent" id="spent">€734</span>
+          </div>
         </div>
-      </div>
-    </section>
+      </section>
 
-    <section class="card breakdown">
-      <h3 class="card__title">Spending breakdown</h3>
+      <section class="card breakdown">
+        <h3 class="card__title">Spending breakdown</h3>
 
-      <div class="donut" id="donut">
-        <div class="donut__center">
-          <span class="donut__label">Total spent</span>
-          <span class="donut__total" id="donutTotal">€734.00</span>
+        <div class="donut" id="donut">
+          <div class="donut__center">
+            <span class="donut__label">Total spent</span>
+            <span class="donut__total" id="donutTotal">€734.00</span>
+          </div>
         </div>
-      </div>
 
-      <ul class="legend" id="legend"></ul>
-    </section>
+        <ul class="legend" id="legend"></ul>
+      </section>
 
-    <section class="card context-card">
-      <h3 class="card__title">Where did my money go?</h3>
+      <section class="card context-card">
+        <h3 class="card__title">Where did my money go?</h3>
 
-      <div class="chips" id="chips"></div>
-
-      <p class="context__headline" id="ctxHeadline"></p>
-
-      <div class="context__grid">
-        <div class="context__item">
-          <span class="context__value" id="ctxPerDay"></span>
-          <span class="context__label">per day</span>
+        <div class="chips-wrap" id="chipsWrap">
+          <button type="button" class="chips__arrow chips__arrow--left" id="chipsLeft" aria-label="Previous">‹</button>
+          <div class="chips" id="chips"></div>
+          <button type="button" class="chips__arrow chips__arrow--right" id="chipsRight" aria-label="Next">›</button>
         </div>
-        <div class="context__item">
-          <span class="context__value" id="ctxIncomePct"></span>
-          <span class="context__label">of income</span>
+
+        <p class="context__headline" id="ctxHeadline"></p>
+
+        <div class="context__grid">
+          <div class="context__item">
+            <span class="context__value" id="ctxPerDay"></span>
+            <span class="context__label">per day</span>
+          </div>
+          <div class="context__item">
+            <span class="context__value" id="ctxIncomePct"></span>
+            <span class="context__label">of income</span>
+          </div>
+          <div class="context__item">
+            <span class="context__value" id="ctxTrend"></span>
+            <span class="context__label" id="ctxTrendLabel"></span>
+          </div>
         </div>
-        <div class="context__item">
-          <span class="context__value" id="ctxTrend"></span>
-          <span class="context__label" id="ctxTrendLabel"></span>
+
+        <div class="insight">
+          <span class="insight__icon">💡</span>
+          <p class="insight__text" id="ctxInsight"></p>
         </div>
-      </div>
+      </section>
 
-      <div class="insight">
-        <span class="insight__icon">💡</span>
-        <p class="insight__text" id="ctxInsight"></p>
-      </div>
-    </section>
+      <section class="card tips-card" id="tipsCard" hidden>
+        <h3 class="card__title" id="tipsTitle"></h3>
+        <div id="tipsBody"></div>
+      </section>
+    </div>
 
-    <section class="card insights-card">
-      <h3 class="card__title">💡 Your spending insights</h3>
-      <div id="insightList"></div>
-    </section>
+    <div class="page" id="page-stats">
+      <section class="card insights-card">
+        <h3 class="card__title">💡 Your spending insights</h3>
+        <div id="insightList"></div>
+      </section>
 
-    <section class="card analytics" id="sec-stats">
-      <h3 class="card__title">Analytics</h3>
+      <section class="card analytics" id="sec-stats">
+        <h3 class="card__title">Analytics</h3>
 
-      <div class="tabs" id="analyticsTabs">
-        <button class="tab" data-period="week">Week</button>
-        <button class="tab tab--active" data-period="month">Month</button>
-        <button class="tab" data-period="year">Year</button>
-      </div>
-
-      <div class="analytics__total">
-        <span class="analytics__amount" id="anTotal"></span>
-        <span class="analytics__period" id="anPeriod"></span>
-      </div>
-
-      <div id="anChart"></div>
-
-      <h4 class="subtitle">Top spending categories</h4>
-      <div id="anTop"></div>
-    </section>
-
-    <section class="card review">
-      <div class="card__head">
-        <h3 class="card__title">Monthly Review</h3>
-        <div class="month-nav">
-          <button class="icon-btn" id="reviewPrev" aria-label="Previous month">‹</button>
-          <button class="icon-btn" id="reviewNext" aria-label="Next month">›</button>
+        <div class="tabs" id="analyticsTabs">
+          <button class="tab" data-period="week">Week</button>
+          <button class="tab tab--active" data-period="month">Month</button>
+          <button class="tab" data-period="year">Year</button>
         </div>
-      </div>
-      <p class="review__month" id="reviewTitle"></p>
-      <div id="reviewBody"></div>
-    </section>
 
-    <section class="card afford">
-      <h3 class="card__title">💰 Can I afford this?</h3>
-
-      <label class="field">
-        <span class="field__label">Price</span>
-        <div class="money-input">
-          <span class="money-input__symbol">€</span>
-          <input type="number" id="affordPrice" class="input input--amount"
-                 placeholder="150" step="0.01" min="0.01" inputmode="decimal">
+        <div class="analytics__total">
+          <span class="analytics__amount" id="anTotal"></span>
+          <span class="analytics__period" id="anPeriod"></span>
         </div>
-      </label>
 
-      <div id="affordResult"></div>
-    </section>
+        <div id="anChart"></div>
 
-    <section class="card budget" id="sec-budget">
-      <div class="card__head">
-        <h3 class="card__title">Monthly Budget</h3>
-        <button class="chip" id="editBudget">Edit</button>
-      </div>
+        <h4 class="subtitle">Top spending categories</h4>
+        <div id="anTop"></div>
+      </section>
 
-      <div id="budgetAlerts"></div>
-      <div id="budgetList"></div>
-    </section>
+      <section class="card review">
+        <div class="card__head">
+          <h3 class="card__title">Monthly Review</h3>
+          <div class="month-nav">
+            <button class="icon-btn" id="reviewPrev" aria-label="Previous month">‹</button>
+            <button class="icon-btn" id="reviewNext" aria-label="Next month">›</button>
+          </div>
+        </div>
+        <p class="review__month" id="reviewTitle"></p>
+        <div id="reviewBody"></div>
+      </section>
 
-    <section class="card goals" id="sec-goals">
-      <div class="card__head">
-        <h3 class="card__title">Savings Goals</h3>
-        <button class="chip" id="addGoal">+ New</button>
-      </div>
-      <div id="goalList"></div>
-    </section>
+      <section class="card afford">
+        <h3 class="card__title">💰 Can I afford this?</h3>
 
-    <section class="card subs">
-      <div class="card__head">
-        <h3 class="card__title">Subscriptions</h3>
-        <button class="chip" id="addSub">+ Add</button>
-      </div>
-      <div id="subList"></div>
-      <div id="subSummary"></div>
-    </section>
+        <label class="field">
+          <span class="field__label">Price</span>
+          <div class="money-input">
+            <span class="money-input__symbol">€</span>
+            <input type="number" id="affordPrice" class="input input--amount"
+                   placeholder="150" step="0.01" min="0.01" inputmode="decimal">
+          </div>
+          <p class="settings__hint">Your regular monthly income. For one-time extra income, use + next to Income on the home screen.</p>
+        </label>
 
-    <section class="card transactions" id="sec-tx">
-      <h3 class="card__title">Transactions</h3>
+        <div id="affordResult"></div>
+      </section>
+    </div>
 
-      <div class="toolbar">
-        <input type="search" id="searchInput" class="input" placeholder="🔍 Search">
-        <select id="filterSelect" class="input"></select>
-      </div>
+    <div class="page" id="page-plan">
+      <section class="card budget" id="sec-budget">
+        <div class="card__head">
+          <h3 class="card__title">Monthly Budget</h3>
+          <button class="chip" id="editBudget">Edit</button>
+        </div>
 
-      <div id="txList"></div>
-    </section>
+        <div id="budgetAlerts"></div>
+        <div id="budgetList"></div>
+      </section>
+
+      <section class="card goals" id="sec-goals">
+        <div class="card__head">
+          <h3 class="card__title">Savings Goals</h3>
+          <button class="chip" id="addGoal">+ New</button>
+        </div>
+        <div id="goalList"></div>
+      </section>
+
+      <section class="card subs">
+        <div class="card__head">
+          <h3 class="card__title">Subscriptions</h3>
+          <button class="chip" id="addSub">+ Add</button>
+        </div>
+        <div id="subList"></div>
+        <div id="subSummary"></div>
+      </section>
+    </div>
+
+    <div class="page" id="page-history">
+      <section class="card transactions" id="sec-tx">
+        <h3 class="card__title">Transactions</h3>
+
+        <div class="toolbar">
+          <input type="search" id="searchInput" class="input" placeholder="🔍 Search">
+          <select id="filterSelect" class="input"></select>
+        </div>
+
+        <div id="txList"></div>
+      </section>
+    </div>
 
   </main>
 </div>
@@ -239,21 +257,10 @@
 
 <!-- МЕНИ ДОЛУ -->
 <nav class="bottom-nav">
-  <button class="nav-btn nav-btn--active" data-target="sec-home">
-    <span class="nav-btn__icon">🏠</span>Home
-  </button>
-  <button class="nav-btn" data-target="sec-stats">
-    <span class="nav-btn__icon">📊</span>Stats
-  </button>
-  <button class="nav-btn" data-target="sec-budget">
-    <span class="nav-btn__icon">🎯</span>Budget
-  </button>
-  <button class="nav-btn" data-target="sec-goals">
-    <span class="nav-btn__icon">🏖</span>Goals
-  </button>
-  <button class="nav-btn" data-target="sec-tx">
-    <span class="nav-btn__icon">📅</span>History
-  </button>
+  <button class="nav-btn nav-btn--active" data-page="home"><span class="nav-btn__icon">🏠</span>Home</button>
+  <button class="nav-btn" data-page="history"><span class="nav-btn__icon">📅</span>History</button>
+  <button class="nav-btn" data-page="plan"><span class="nav-btn__icon">🎯</span>Plan</button>
+  <button class="nav-btn" data-page="stats"><span class="nav-btn__icon">📊</span>Stats</button>
 </nav>
 
 <!-- ADD EXPENSE ФОРМА -->
@@ -452,13 +459,64 @@
       </select>
     </label>
 
+    <div id="recurringBox" hidden>
+      <div class="field">
+        <span class="field__label">Recurring expenses</span>
+        <div id="recurringList"></div>
+      </div>
+    </div>
+
     <button type="submit" class="btn-primary">Save</button>
 
     <div class="settings__section">
       <button type="button" class="btn-secondary" id="installApp" hidden>Install app</button>
       <p class="settings__hint" id="iosHint" hidden>On iPhone: tap the Share button, then "Add to Home Screen".</p>
+      <p class="settings__hint" id="backupInfo"></p>
+      <button type="button" class="btn-secondary" id="backupBtn">Back up data</button>
+      <label class="btn-secondary settings__file">
+        Restore from backup
+        <input type="file" id="restoreFile" accept=".json,application/json" hidden>
+      </label>
       <button type="button" class="btn-secondary" id="exportCsv">Export CSV</button>
       <button type="button" class="btn-danger" id="deleteAll">Delete all data</button>
+    </div>
+  </form>
+</div>
+
+<!-- ДОПОЛНИТЕЛЕН ПРИХОД -->
+<div class="modal" id="incomeModal">
+  <div class="modal__backdrop" id="incomeBackdrop"></div>
+
+  <form class="modal__sheet" id="incomeForm">
+    <div class="modal__header">
+      <h3 class="modal__title">Extra income</h3>
+      <button type="button" class="icon-btn" id="closeIncome" aria-label="Затвори">✕</button>
+    </div>
+
+    <label class="field">
+      <span class="field__label">Amount</span>
+      <div class="money-input">
+        <span class="money-input__symbol">€</span>
+        <input type="number" id="incomeAmount" class="input input--amount"
+               placeholder="0.00" step="0.01" min="0.01" inputmode="decimal" required>
+      </div>
+    </label>
+
+    <label class="field">
+      <span class="field__label">Description</span>
+      <input type="text" id="incomeDesc" class="input" placeholder="Gift" maxlength="40">
+    </label>
+
+    <label class="field">
+      <span class="field__label">Date</span>
+      <input type="date" id="incomeDate" class="input" required>
+    </label>
+
+    <button type="submit" class="btn-primary">Add income</button>
+
+    <div id="incomeListBox" hidden>
+      <h4 class="subtitle review__block">Extra income this month</h4>
+      <div id="incomeList"></div>
     </div>
   </form>
 </div>
@@ -486,7 +544,64 @@
   </form>
 </div>
 
+<!-- БРЗО ДОДАВАЊЕ -->
+<div class="modal" id="quickModal">
+  <div class="modal__backdrop" id="quickBackdrop"></div>
+
+  <div class="modal__sheet">
+    <div class="modal__header">
+      <h3 class="modal__title">Quick add</h3>
+      <button type="button" class="icon-btn" id="closeQuick" aria-label="Затвори">✕</button>
+    </div>
+
+    <div class="qa__amount" id="qaAmount">€0</div>
+
+    <input type="text" id="qaDesc" class="input" placeholder="What for? (optional)"
+           maxlength="60" autocomplete="off">
+    <div class="qa__suggest" id="qaSuggest"></div>
+
+    <div class="qa__cats" id="qaCats"></div>
+
+    <div class="qa__keys" id="qaKeys"></div>
+
+    <details class="qa__more" id="qaMore">
+      <summary>More options</summary>
+      <div class="qa__more-body">
+        <label class="field">
+          <span class="field__label">Date</span>
+          <input type="date" id="qaDate" class="input">
+        </label>
+
+        <div class="field">
+          <span class="field__label">Payment</span>
+          <div class="segmented">
+            <label class="segmented__option">
+              <input type="radio" name="qaPayment" value="Cash"><span>Cash</span>
+            </label>
+            <label class="segmented__option">
+              <input type="radio" name="qaPayment" value="Card" checked><span>Card</span>
+            </label>
+            <label class="segmented__option">
+              <input type="radio" name="qaPayment" value="Bank"><span>Bank</span>
+            </label>
+          </div>
+        </div>
+
+        <label class="qa__check">
+          <input type="checkbox" id="qaRepeat"> Repeat every month
+        </label>
+      </div>
+    </details>
+
+    <button type="button" class="btn-primary" id="qaAdd" disabled>Add</button>
+  </div>
+</div>
+
 <script src="js/i18n.js"></script>
+<script src="js/tips.js"></script>
 <script src="js/app.js"></script>
+<script src="js/quick.js"></script>
+<script src="js/backup.js"></script>
+
 </body>
 </html>
