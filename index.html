@@ -67,6 +67,7 @@
       <h1 class="header__title">Where Did My Money Go?</h1>
     </div>
     <div class="header__right">
+      <button class="pro-chip" id="proHeaderBtn" type="button">⭐ PRO</button>
       <button class="icon-btn" id="themeToggle" aria-label="Смени тема">🌙</button>
       <button class="avatar" id="openSettings" aria-label="Settings">👤</button>
     </div>
@@ -99,6 +100,15 @@
             <span class="stat__value stat__value--spent" id="spent">€734</span>
           </div>
         </div>
+      </section>
+
+      <section class="quick-repeat" id="quickRepeat" hidden>
+        <p class="quick-repeat__title">Quick repeat</p>
+        <div class="qr-list" id="quickRepeatList"></div>
+      </section>
+
+      <section class="card highlights" id="highlights" hidden>
+        <div id="highlightList"></div>
       </section>
 
       <section class="card breakdown">
@@ -153,6 +163,11 @@
     </div>
 
     <div class="page" id="page-stats">
+      <section class="card why-card" id="whyCard" hidden>
+        <h3 class="card__title" id="whyTitle"></h3>
+        <div id="whyBody"></div>
+      </section>
+
       <section class="card insights-card">
         <h3 class="card__title">💡 Your spending insights</h3>
         <div id="insightList"></div>
@@ -254,6 +269,8 @@
 
 <!-- КОПЧЕ + -->
 <button class="fab" id="openModal" aria-label="Add expense">+</button>
+
+
 
 <!-- МЕНИ ДОЛУ -->
 <nav class="bottom-nav">
@@ -469,6 +486,7 @@
     <button type="submit" class="btn-primary">Save</button>
 
     <div class="settings__section">
+      <button type="button" class="btn-secondary" id="proSettingsBtn">⭐ Pro</button>
       <button type="button" class="btn-secondary" id="installApp" hidden>Install app</button>
       <p class="settings__hint" id="iosHint" hidden>On iPhone: tap the Share button, then "Add to Home Screen".</p>
       <p class="settings__hint" id="backupInfo"></p>
@@ -481,6 +499,50 @@
       <button type="button" class="btn-danger" id="deleteAll">Delete all data</button>
     </div>
   </form>
+</div>
+
+<!-- PRO -->
+<div class="modal" id="proModal">
+  <div class="modal__backdrop" id="proBackdrop"></div>
+
+  <div class="modal__sheet">
+    <div class="modal__header">
+      <h3 class="modal__title">⭐ Pro</h3>
+      <button type="button" class="icon-btn" id="closePro" aria-label="Затвори">✕</button>
+    </div>
+
+    <p class="pro__badge">Coming soon · not available yet</p>
+    <p class="pro__lead">We are building Pro. Tell us what you would pay, and we will let you know when it is ready. No payment now.</p>
+
+    <p class="pro__label">Planned:</p>
+    <ul class="pro__features">
+      <li>📥 Import from your bank statement or a photo of a receipt</li>
+      <li>☁️ Sync between your phone and computer</li>
+      <li>📈 Monthly report with a savings plan</li>
+      <li>📄 Export your report as PDF</li>
+    </ul>
+
+    <div class="pro__plans" id="proPlans">
+      <button type="button" class="pro-plan" data-plan="monthly">
+        <span class="pro-plan__name">Monthly</span>
+        <span class="pro-plan__price">€4.99</span>
+        <span class="pro-plan__sub">per month</span>
+      </button>
+      <button type="button" class="pro-plan" data-plan="yearly">
+        <span class="pro-plan__name">Yearly</span>
+        <span class="pro-plan__price">€29.99</span>
+        <span class="pro-plan__sub">per year</span>
+      </button>
+      <button type="button" class="pro-plan" data-plan="lifetime">
+        <span class="pro-plan__name">Lifetime</span>
+        <span class="pro-plan__price">€39.99</span>
+        <span class="pro-plan__sub">one time</span>
+      </button>
+    </div>
+
+    <a class="btn-primary pro__cta" id="proJoin" href="#" target="_blank" rel="noopener">Join the waiting list</a>
+    <p class="pro__fine">You will leave your email in a short form. We only write to you when Pro is ready.</p>
+  </div>
 </div>
 
 <!-- ДОПОЛНИТЕЛЕН ПРИХОД -->
@@ -554,6 +616,8 @@
       <button type="button" class="icon-btn" id="closeQuick" aria-label="Затвори">✕</button>
     </div>
 
+    <div class="qa__combos" id="qaCombos"></div>
+
     <div class="qa__amount" id="qaAmount">€0</div>
 
     <input type="text" id="qaDesc" class="input" placeholder="What for? (optional)"
@@ -602,6 +666,10 @@
 <script src="js/app.js"></script>
 <script src="js/quick.js"></script>
 <script src="js/backup.js"></script>
+<script data-goatcounter="https://moneyapp.goatcounter.com/count"
+        data-goatcounter-settings='{"allow_local": true}'
+        async src="//gc.zgo.at/count.js"></script>
+<script src="js/pro.js"></script>
 
 </body>
 </html>

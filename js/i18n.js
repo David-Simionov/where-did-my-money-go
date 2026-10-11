@@ -244,7 +244,46 @@ const DICT = {
         'Your regular monthly income. For one-time extra income, use + next to Income on the home screen.': 'Твојот редовен месечен приход. За еднократен дополнителен приход користи + покрај „Приход“ на почетната.',
         'Plan': 'План',
         'Previous': 'Претходно',
-        'Next': 'Следно'
+        'Next': 'Следно',
+
+        // Преглед: најважното и "Зошто?"
+        'You spend the most on {cat}': 'Најмногу трошиш на {cat}',
+        '{amount} · {pct}% of your spending': '{amount} · {pct}% од твоите трошоци',
+        'You spend more than last month': 'Трошиш повеќе отколку минатиот месец',
+        'You spend less than last month': 'Трошиш помалку отколку минатиот месец',
+        '{amount} more than the first {n} days of {month}.': '{amount} повеќе отколку првите {n} дена од {month}.',
+        '{amount} less than the first {n} days of {month}.': '{amount} помалку отколку првите {n} дена од {month}.',
+        'Why?': 'Зошто?',
+        'Budget exceeded': 'Надминат буџет',
+        'Budgets exceeded: {n}': 'Надминати буџети: {n}',
+        'Biggest overrun: {cat} (+{amount})': 'Најголемо надминување: {cat} (+{amount})',
+        'See budget': 'Види буџет',
+        'Why did I spend more?': 'Зошто потрошив повеќе?',
+        'Why did I spend less?': 'Зошто потрошив помалку?',
+        '{pct}% vs the first {n} days of {month} ({amount})': '{pct}% спрема првите {n} дена од {month} ({amount})',
+        'Biggest changes': 'Најголеми промени',
+        'On the other side': 'Од другата страна',
+        'The same days of each month are compared, so the comparison is fair.': 'Се споредуваат истите денови од месецот, па споредбата е фер.',
+
+        // Брзо повторување
+        'Quick repeat': 'Брзо повторување',
+        'Added: {name} {amount}': 'Додадено: {name} {amount}',
+
+        // PRO
+        'Coming soon': 'Наскоро',
+        'Coming soon · not available yet': 'Наскоро · сè уште не е достапно',
+        'We are building Pro. Tell us what you would pay, and we will let you know when it is ready. No payment now.': 'Го градиме Pro. Кажи ни колку би платил и ќе ти јавиме кога ќе биде готово. Сега не се плаќа ништо.',
+        'Planned:': 'Планирано:',
+        '📥 Import from your bank statement or a photo of a receipt': '📥 Увоз од извод од банка или од слика на сметка',
+        '☁️ Sync between your phone and computer': '☁️ Синхронизација меѓу телефон и компјутер',
+        '📈 Monthly report with a savings plan': '📈 Месечен извештај со план за штедење',
+        '📄 Export your report as PDF': '📄 Извоз на извештајот како PDF',
+        'Lifetime': 'Засекогаш',
+        'per month': 'месечно',
+        'per year': 'годишно',
+        'one time': 'еднократно',
+        'Join the waiting list': 'Приклучи се на листата на чекање',
+        'You will leave your email in a short form. We only write to you when Pro is ready.': 'Ќе ја оставиш е-поштата во кус формулар. Ќе ти пишеме само кога Pro ќе биде готов.'
     }
 };
 

@@ -197,7 +197,8 @@ function openQuick() {
 
     buildKeys();
     renderQuickCats();
-    showSuggest(qa.mem.recent);
+    showSuggest([]);
+    renderModalCombos();
     updateQuick();
     qaModal.classList.add('modal--open');
 }
@@ -301,7 +302,7 @@ qe('qaCats').addEventListener('click', (e) => {
 
 qe('qaDesc').addEventListener('input', () => {
     const q = qe('qaDesc').value.trim().toLowerCase();
-    if (!q) return showSuggest(qa.mem.recent);
+    if (!q) return showSuggest([]);
 
     // познат опис: категоријата се бира сама (освен ако веќе си избрал рачно)
     const hit = qa.mem.byDesc.get(q);
@@ -376,3 +377,118 @@ renderRecurring();
 document.addEventListener('visibilitychange', () => {
     if (!document.hidden) syncRecurring();
 });
+
+// ---------- 9. Брзо повторување ----------
+// Комбинации (опис + категорија) што си ги внел најмалку 2 пати во последните ~4 месеци.
+function pickAmount(g) {
+    return Number(Object.entries(g.amounts)
+        .sort((a, b) => b[1].n - a[1].n || b[1].last.localeCompare(a[1].last))[0][0]);
+}
+
+function pickPayment(g) {
+    const pay = Object.entries(g.pays).sort((a, b) => b[1] - a[1])[0][0];
+    return ['Cash', 'Card', 'Bank'].includes(pay) ? pay : 'Card';
+}
+
+function topCombos(limit = 5) {
+    const horizon = toISODate(new Date(Date.now() - 120 * 86400000));
+    const groups = new Map();
+
+    expenses.forEach(e => {
+        const desc = (e.description || '').trim();
+        if (e.rec || !desc || e.date < horizon) return;          // без автоматски и без опис
+
+        const key = desc.toLowerCase() + '|' + e.category;
+        let g = groups.get(key);
+        if (!g) {
+            g = { desc, cat: e.category, n: 0, lastDate: '', amounts: {}, pays: {} };
+            groups.set(key, g);
+        }
+
+        g.n++;
+        if (e.date >= g.lastDate) { g.lastDate = e.date; g.desc = desc; }   // последно напишаниот правопис
+
+        const a = g.amounts[e.amount] || { n: 0, last: '' };
+        a.n++;
+        if (e.date > a.last) a.last = e.date;
+        g.amounts[e.amount] = a;
+
+        g.pays[e.payment] = (g.pays[e.payment] || 0) + 1;
+    });
+
+    return [...groups.values()]
+        .filter(g => g.n >= 2 && CATEGORIES.some(c => c.name === g.cat))
+        .sort((a, b) => b.n - a.n || b.lastDate.localeCompare(a.lastDate))
+        .slice(0, limit)
+        .map(g => ({ desc: g.desc, cat: g.cat, amount: pickAmount(g), pay: pickPayment(g) }));
+}
+
+let combosCache = [];
+
+function comboChip(c, i) {
+    const cat = CATEGORIES.find(x => x.name === c.cat);
+    return `<button type="button" class="chip" data-combo="${i}">
+        ${cat.icon} ${escapeHtml(c.desc)} · <strong>${formatMoney(c.amount)}</strong></button>`;
+}
+
+// Почетна: копчиња што додаваат веднаш
+function renderQuickRepeat() {
+    combosCache = topCombos(5);
+    qe('quickRepeat').hidden = combosCache.length === 0;
+    qe('quickRepeatList').innerHTML = combosCache.map(comboChip).join('');
+}
+
+// Модал: копчиња што само ја пополнуваат формата
+function renderModalCombos() {
+    combosCache = topCombos(5);
+    qe('qaCombos').innerHTML = combosCache.map(comboChip).join('');
+}
+
+let lastComboTap = 0;
+
+function addCombo(c) {
+    if (Date.now() - lastComboTap < 700) return;                // двоен допир = еден трошок
+    lastComboTap = Date.now();
+
+    const exp = {
+        id: newId(), amount: c.amount, category: c.cat, description: c.desc,
+        date: toISODate(new Date()), payment: c.pay
+    };
+    expenses.push(exp);
+    saveExpenses();
+    refresh();
+
+    showToast(
+        t('Added: {name} {amount}', { name: c.desc, amount: formatMoney(c.amount) }),
+        t('Undo'),
+        () => undoQuick(exp.id, null)
+    );
+}
+
+function fillFromCombo(c) {
+    qa.amount = String(+c.amount.toFixed(2));
+    qa.cat = c.cat;
+    qa.catTouched = true;                                       // описот да не ја менува категоријата
+    qe('qaDesc').value = c.desc;
+    showSuggest([]);
+
+    const radio = document.querySelector(`input[name="qaPayment"][value="${c.pay}"]`);
+    if (radio) radio.checked = true;
+
+    renderQuickCats();
+    updateQuick();
+}
+
+qe('quickRepeatList').addEventListener('click', (e) => {
+    const btn = e.target.closest('[data-combo]');
+    const c = btn && combosCache[btn.dataset.combo];
+    if (c) addCombo(c);
+});
+
+qe('qaCombos').addEventListener('click', (e) => {
+    const btn = e.target.closest('[data-combo]');
+    const c = btn && combosCache[btn.dataset.combo];
+    if (c) fillFromCombo(c);
+});
+
+renderQuickRepeat();

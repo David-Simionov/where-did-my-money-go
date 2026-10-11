@@ -1681,3 +1681,216 @@ body.loaded .bar {
         display: none !important;
     }
 }
+
+/* ============ НАЈВАЖНОТО (Почетна) ============ */
+.insight-item__icon--warn { background: rgba(239, 68, 68, 0.12); }
+.insight-item__icon--ok   { background: rgba(16, 185, 129, 0.12); }
+
+.link-btn {
+    margin-top: 6px;
+    padding: 4px 0;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--primary);
+}
+
+.link-btn::after {
+    content: ' ›';
+}
+
+/* ============ ЗОШТО? ============ */
+.why__total {
+    font-size: 32px;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    overflow-wrap: anywhere;
+}
+
+.why__sub {
+    font-size: 13px;
+    line-height: 1.5;
+    color: var(--text-muted);
+    margin: 4px 0 22px;
+}
+
+.why__other {
+    font-size: 13px;
+    line-height: 1.6;
+    color: var(--text-muted);
+    margin-top: 18px;
+}
+
+/* ============ БРЗО ПОВТОРУВАЊЕ ============ */
+.quick-repeat {
+    margin: -4px 0 20px;
+}
+
+.quick-repeat__title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-muted);
+    margin-bottom: 10px;
+}
+
+.qr-list,
+.qa__combos {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.qa__combos {
+    margin-bottom: 14px;
+}
+
+.qa__combos:empty {
+    display: none;
+}
+
+.qr-list .chip {
+    padding: 9px 14px;
+    font-size: 14px;
+    background: var(--card);
+}
+
+.qr-list .chip,
+.qa__combos .chip {
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+/* ============ PRO ============ */
+.header__left {
+    min-width: 0;
+}
+
+.header__title {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.pro-chip {
+    padding: 8px 12px;
+    border-radius: 12px;
+    background: var(--primary-soft);
+    color: var(--primary);
+    font-size: 13px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.pro__badge {
+    display: inline-block;
+    padding: 4px 10px;
+    margin-bottom: 12px;
+    border-radius: 999px;
+    background: rgba(245, 158, 11, 0.15);
+    color: #b45309;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+[data-theme="dark"] .pro__badge {
+    color: #fbbf24;
+}
+
+.pro__lead {
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--text-muted);
+    margin-bottom: 18px;
+}
+
+.pro__label {
+    font-size: 13px;
+    font-weight: 700;
+    margin-bottom: 10px;
+}
+
+.pro__features {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    font-size: 14px;
+    line-height: 1.5;
+    margin-bottom: 22px;
+}
+
+.pro__plans {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin-bottom: 18px;
+}
+
+.pro-plan {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 14px 6px;
+    border-radius: 14px;
+    border: 2px solid var(--border);
+    background: var(--bg);
+    transition: all 0.15s ease;
+}
+
+.pro-plan__name { font-size: 12px; font-weight: 600; color: var(--text-muted); }
+.pro-plan__price { font-size: 18px; font-weight: 800; letter-spacing: -0.02em; }
+.pro-plan__sub { font-size: 11px; color: var(--text-muted); }
+
+.pro-plan--active {
+    border-color: var(--primary);
+    background: var(--primary-soft);
+}
+
+.pro__cta {
+    display: block;
+    text-align: center;
+    text-decoration: none;
+}
+
+.pro__fine {
+    font-size: 12px;
+    line-height: 1.5;
+    color: var(--text-muted);
+    margin-top: 12px;
+    text-align: center;
+}
+
+/* ПОПРАВКА: насловот се прекршува во два реда наместо да се сече */
+.header__title {
+    overflow: visible;
+    text-overflow: clip;
+    white-space: normal;
+    line-height: 1.2;
+}
+
+.header {
+    gap: 12px;
+}
+
+.header__right {
+    flex-shrink: 0;
+    gap: 6px;
+}
+
+@media (max-width: 480px) {
+    .header .icon-btn,
+    .header .avatar {
+        width: 38px;
+        height: 38px;
+    }
+
+    .pro-chip {
+        padding: 8px 10px;
+        font-size: 12px;
+    }
+
+    .header__title {
+        font-size: 18px;
+    }
+}

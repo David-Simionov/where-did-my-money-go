@@ -102,6 +102,9 @@ function refresh(focusCategory) {
     renderAnalytics();
     renderReview();
     renderAfford();
+    renderHighlights();
+    renderWhy();
+    if (typeof renderQuickRepeat === 'function') renderQuickRepeat();
 }
 
 // ============ ПОМОШНИ ФУНКЦИИ ============
@@ -1799,6 +1802,197 @@ document.getElementById('incomeList').addEventListener('click', (e) => {
     refresh();
     renderIncomeList();
 });
+
+// ============ ПРЕГЛЕД: НАЈВАЖНОТО И "ЗОШТО?" ============
+const MIN_COMPARE_DAYS = 5;   // пред ова споредбата со минатиот месец е премногу "бучна"
+
+function signed(n) {
+    return (n > 0 ? '+' : n < 0 ? '−' : '') + formatMoney(Math.abs(n));
+}
+
+// овој месец досега, спрема ИСТИТЕ денови од минатиот месец (фер споредба)
+function comparePeriod() {
+    const now = new Date();
+    const day = now.getDate();
+    const prevDate = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+    const prevDay = Math.min(day, new Date(now.getFullYear(), now.getMonth(), 0).getDate());
+    const curKey = monthKey(now);
+    const prevKey = monthKey(prevDate);
+
+    const cur = {}, prev = {};
+    expenses.forEach(e => {
+        const d = Number(e.date.slice(8, 10));
+        if (e.date.startsWith(curKey) && d <= day) cur[e.category] = (cur[e.category] || 0) + e.amount;
+        else if (e.date.startsWith(prevKey) && d <= prevDay) prev[e.category] = (prev[e.category] || 0) + e.amount;
+    });
+
+    const round = n => Math.round(n * 100) / 100;
+    const names = [...new Set([...Object.keys(cur), ...Object.keys(prev)])];
+    const rows = names.map(name => ({
+        name,
+        cur: round(cur[name] || 0),
+        prev: round(prev[name] || 0),
+        diff: round((cur[name] || 0) - (prev[name] || 0))
+    }));
+
+    const curTotal = round(rows.reduce((s, r) => s + r.cur, 0));
+    const prevTotal = round(rows.reduce((s, r) => s + r.prev, 0));
+
+    return {
+        day, prevDay,
+        prevMonth: getMonthName(prevDate),
+        rows, curTotal, prevTotal,
+        diff: round(curTotal - prevTotal)
+    };
+}
+
+function renderHighlights() {
+    const card = document.getElementById('highlights');
+    const items = [];
+
+    // 1. најголема категорија
+    if (data.spent > 0 && data.categories.length) {
+        const c = data.categories[0];
+        items.push({
+            icon: c.icon, tone: '',
+            title: t('You spend the most on {cat}', { cat: t(c.name).toLowerCase() }),
+            text: t('{amount} · {pct}% of your spending', {
+                amount: formatMoney(c.amount),
+                pct: Math.round((c.amount / data.spent) * 100)
+            })
+        });
+    }
+
+    // 2. спрема минатиот месец (исти денови)
+    const cmp = comparePeriod();
+    if (cmp.prevTotal > 0 && cmp.diff !== 0 && cmp.day >= MIN_COMPARE_DAYS) {
+        const more = cmp.diff > 0;
+        items.push({
+            icon: more ? '⚠️' : '✅', tone: more ? 'warn' : 'ok',
+            title: t(more ? 'You spend more than last month' : 'You spend less than last month'),
+            text: t(more
+                    ? '{amount} more than the first {n} days of {month}.'
+                    : '{amount} less than the first {n} days of {month}.',
+                { amount: formatMoney(Math.abs(cmp.diff)), n: cmp.prevDay, month: cmp.prevMonth }),
+            link: ['stats', t('Why?')]
+        });
+    }
+
+    // 3. надминати буџети
+    const over = [];
+    if (budgets.overall > 0 && data.spent > budgets.overall) {
+        over.push({ key: 'overall', by: data.spent - budgets.overall });
+    }
+    CATEGORIES.forEach(cat => {
+        const limit = budgets.categories[cat.name];
+        if (!limit) return;
+        const found = data.categories.find(c => c.name === cat.name);
+        const spent = found ? found.amount : 0;
+        if (spent > limit) over.push({ key: cat.name, by: spent - limit });
+    });
+    over.sort((a, b) => b.by - a.by);
+
+    if (over.length === 1) {
+        const o = over[0];
+        items.push({
+            icon: '⚠️', tone: 'warn',
+            title: t('Budget exceeded'),
+            text: o.key === 'overall'
+                ? t("You've exceeded your overall budget by {amount}.", { amount: formatMoney(o.by) })
+                : t("You've exceeded your {cat} budget by {amount}.", { cat: t(o.key), amount: formatMoney(o.by) }),
+            link: ['plan', t('See budget')]
+        });
+    } else if (over.length > 1) {
+        const o = over[0];
+        items.push({
+            icon: '⚠️', tone: 'warn',
+            title: t('Budgets exceeded: {n}', { n: over.length }),
+            text: t('Biggest overrun: {cat} (+{amount})', {
+                cat: o.key === 'overall' ? t('Overall') : t(o.key),
+                amount: formatMoney(o.by)
+            }),
+            link: ['plan', t('See budget')]
+        });
+    }
+
+    card.hidden = items.length === 0;
+    document.getElementById('highlightList').innerHTML = items.map(i => `
+        <div class="insight-item">
+            <span class="insight-item__icon ${i.tone ? 'insight-item__icon--' + i.tone : ''}">${i.icon}</span>
+            <div>
+                <p class="insight-item__title">${i.title}</p>
+                <p class="insight-item__text">${i.text}</p>
+                ${i.link ? `<button type="button" class="link-btn" data-goto="${i.link[0]}">${i.link[1]}</button>` : ''}
+            </div>
+        </div>`).join('');
+}
+
+document.getElementById('highlightList').addEventListener('click', (e) => {
+    const btn = e.target.closest('[data-goto]');
+    if (btn) showPage(btn.dataset.goto);
+});
+
+function renderWhy() {
+    const card = document.getElementById('whyCard');
+    const cmp = comparePeriod();
+
+    if (!(cmp.prevTotal > 0) || cmp.diff === 0 || cmp.day < MIN_COMPARE_DAYS) {
+        card.hidden = true;
+        return;
+    }
+
+    const more = cmp.diff > 0;
+    const pct = Math.round((Math.abs(cmp.diff) / cmp.prevTotal) * 100);
+
+    // категории што најмногу придонеле во насоката на промената
+    const movers = cmp.rows
+        .filter(r => (more ? r.diff > 0 : r.diff < 0))
+        .sort((a, b) => (more ? b.diff - a.diff : a.diff - b.diff))
+        .slice(0, 3);
+
+    if (!movers.length) {
+        card.hidden = true;
+        return;
+    }
+    card.hidden = false;
+
+    // најголемата промена во спротивна насока
+    const other = cmp.rows
+        .filter(r => (more ? r.diff < 0 : r.diff > 0))
+        .sort((a, b) => (more ? a.diff - b.diff : b.diff - a.diff))[0];
+
+    const max = Math.abs(movers[0].diff);
+    const iconOf = (name) => (CATEGORIES.find(c => c.name === name) || { icon: '💰' }).icon;
+
+    document.getElementById('whyTitle').textContent =
+        t(more ? 'Why did I spend more?' : 'Why did I spend less?');
+
+    document.getElementById('whyBody').innerHTML = `
+        <p class="why__total ${more ? 'text-spent' : 'text-income'}">${signed(cmp.diff)}</p>
+        <p class="why__sub">${t('{pct}% vs the first {n} days of {month} ({amount})', {
+        pct: (more ? '+' : '−') + pct,
+        n: cmp.prevDay,
+        month: cmp.prevMonth,
+        amount: formatMoney(cmp.prevTotal)
+    })}</p>
+
+        <h4 class="subtitle">${t('Biggest changes')}</h4>
+        ${movers.map(r => `
+            <div class="budget-row">
+                <div class="budget-row__top">
+                    <span class="budget-row__name">${iconOf(r.name)} ${t(r.name)}</span>
+                    <span class="fact-row__value ${more ? 'text-spent' : 'text-income'}">${signed(r.diff)}</span>
+                </div>
+                <div class="progress progress--thin">
+                    <div class="progress__bar ${more ? 'progress__bar--over' : 'progress__bar--goal'}"
+                         style="width:${(Math.abs(r.diff) / max) * 100}%"></div>
+                </div>
+            </div>`).join('')}
+
+        ${other ? `<p class="why__other">${t('On the other side')}: ${iconOf(other.name)} ${t(other.name)} ${signed(other.diff)}</p>` : ''}
+
+        <p class="tips__note">${t('The same days of each month are compared, so the comparison is fair.')}</p>`;
+}
 
 // ============ МЕНИ ДОЛУ (екрани) ============
 const navButtons = document.querySelectorAll('.nav-btn');
