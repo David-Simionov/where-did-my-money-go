@@ -1,8 +1,10 @@
-const CACHE = 'money-v6';
+const CACHE = 'money-v7';
 
 const SHELL = [
     './', 'index.html', 'css/style.css',
-    'js/i18n.js', 'js/tips.js', 'js/app.js', 'js/quick.js', 'js/backup.js', 'js/pro.js',
+    'js/i18n.js', 'js/tips.js', 'js/core.js', 'js/settings.js', 'js/dashboard.js',
+    'js/expenses.js', 'js/plan.js', 'js/analysis.js', 'js/quick.js', 'js/backup.js',
+    'js/pro.js', 'js/main.js',
     'manifest.json', 'icons/icon-192.png', 'icons/icon-512.png', 'icons/apple-touch-icon.png'
 ];
 

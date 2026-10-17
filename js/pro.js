@@ -1,6 +1,3 @@
-// ============ PRO: ТЕСТ НА ИНТЕРЕС ============
-// Не продава ништо. Мери колку луѓе се заинтересирани и по која цена.
-
 const PRO_FORM_URL = 'https://docs.google.com/forms/d/e/1FAIpQLScjLHB8cQhHO1qYRI-I26qtzeGmgT6PzH_9jUe-Lp0nBIItGw/viewform';        // залепи го линкот од твојот Google Form
 const PRO_FORM_READY = !PRO_FORM_URL.includes('ВАШ-ЛИНК');
 const PRO_PLANS = ['monthly', 'yearly', 'lifetime'];

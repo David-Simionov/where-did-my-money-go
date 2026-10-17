@@ -1,6 +1,3 @@
-// ============ БРЗО ВНЕСУВАЊЕ И ПОВТОРЛИВИ ТРОШОЦИ ============
-// Користи од app.js: expenses, saveExpenses, refresh, CATEGORIES, formatMoney, fitText...
-
 const qe = (id) => document.getElementById(id);
 
 // ---------- 1. Повторливи трошоци ----------

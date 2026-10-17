@@ -35,7 +35,6 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
 
   <script>
-    // рана проверка: без бело трепкање во dark mode и без повторен splash во иста сесија
     try {
       const t = localStorage.getItem('theme');
       if (t) document.documentElement.setAttribute('data-theme', t);
@@ -663,12 +662,18 @@
 
 <script src="js/i18n.js"></script>
 <script src="js/tips.js"></script>
-<script src="js/app.js"></script>
+<script src="js/core.js"></script>
+<script src="js/settings.js"></script>
+<script src="js/dashboard.js"></script>
+<script src="js/expenses.js"></script>
+<script src="js/plan.js"></script>
+<script src="js/analysis.js"></script>
 <script src="js/quick.js"></script>
 <script src="js/backup.js"></script>
 <script data-goatcounter="https://moneyapp.goatcounter.com/count"
         async src="//gc.zgo.at/count.js"></script>
 <script src="js/pro.js"></script>
+<script src="js/main.js"></script>
 
 </body>
 </html>

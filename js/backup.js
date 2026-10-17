@@ -1,7 +1,3 @@
-// ============ РЕЗЕРВНА КОПИЈА ============
-// Користи од другите датотеки: expenses, budgets, goals, subs, settings, recurring,
-// CATEGORIES, CURRENCIES, LOCALES, MAX_AMOUNT, toISODate, newId, showToast, t, locale.
-
 const bk = (id) => document.getElementById(id);
 
 const BACKUP_APP = 'where-did-my-money-go';
@@ -13,7 +9,6 @@ const CAT_NAMES = new Set(CATEGORIES.map(c => c.name));
 const PAYMENTS = ['Cash', 'Card', 'Bank'];
 
 // ---------- 1. Проверка и чистење на податоци од датотеката ----------
-// Датотеката не е доверлива: секое поле се проверува, а на лошо се дава безбедна вредност.
 const isObj = (v) => v !== null && typeof v === 'object' && !Array.isArray(v);
 const cleanStr = (v, max) => (typeof v === 'string' ? v.trim().slice(0, max) : '');
 const cleanNum = (v) => (typeof v === 'number' && isFinite(v) ? v : NaN);
@@ -28,7 +23,6 @@ function validDate(s) {
         toISODate(new Date(s + 'T00:00:00')) === s;   // одбива 2026-02-31
 }
 
-// ID-ата влегуваат во HTML (data-id), па смеат да содржат само безбедни знаци и мора да се уникатни
 function idMaker() {
     const used = new Set();
     return (v) => {
@@ -175,14 +169,12 @@ async function saveBackupFile() {
     const name = `money-backup-${toISODate(new Date())}.json`;
     const file = new File([JSON.stringify(buildBackup(), null, 2)], name, { type: 'application/json' });
 
-    // на телефон: листот за споделување (Save to Files, Google Drive, ...)
     if (navigator.canShare && navigator.canShare({ files: [file] })) {
         try {
             await navigator.share({ files: [file], title: name });
             return true;
         } catch (err) {
-            if (err.name === 'AbortError') return false;   // корисникот одустанал
-            // друга грешка: паѓаме на обично превземање
+            if (err.name === 'AbortError') return false;
         }
     }
 
@@ -218,7 +210,6 @@ function applyRestore(clean) {
         Object.keys(writes).forEach(k => localStorage.setItem(k, JSON.stringify(writes[k])));
         if (clean.theme) localStorage.setItem('theme', clean.theme);   // темата е обичен текст, не JSON
     } catch {
-        // нема место: врати го како што било
         keys.forEach((k, i) => (before[i] === null ? localStorage.removeItem(k) : localStorage.setItem(k, before[i])));
         alert(t('Could not restore the backup.'));
         return;
@@ -280,13 +271,11 @@ function updateBackupInfo() {
         })
         : t('No backup yet. Your data lives only on this device.');
 
-    // црвено ако има податоци, а копијата е стара (над 30 дена) или ја нема
     el.classList.toggle('settings__hint--warn', expenses.length > 0 && (!valid || daysSince(last) > 30));
 }
 
 bk('openSettings').addEventListener('click', updateBackupInfo);
 
-// порака по успешно враќање (страницата се освежува)
 if (sessionStorage.getItem('restored')) {
     sessionStorage.removeItem('restored');
     setTimeout(() => showToast(t('Backup restored ✓')), 2200);   // по splash-от

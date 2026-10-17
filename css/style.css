@@ -1359,7 +1359,6 @@ body.loaded .bar {
     transform: scale(0.95);
 }
 
-/* мазен премин светло/темно */
 .card, .bottom-nav {
     transition: background 0.25s ease, border-color 0.25s ease;
 }
@@ -1628,7 +1627,6 @@ body.loaded .bar {
     scroll-snap-align: start;
 }
 
-/* сенка на работ каде има уште категории */
 .chips-wrap::before,
 .chips-wrap::after {
     content: '';
