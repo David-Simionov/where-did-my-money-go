@@ -1322,7 +1322,7 @@ input[type="number"] {
    па не ги блокира hover/active ефектите */
 body.loaded .main .card {
     animation: fadeUp 0.5s ease backwards;
-    animation-delay: calc(var(--i, 0) * 70ms);
+    animation-delay: 0ms;
 }
 
 body.loaded .donut {
