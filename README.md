@@ -18,3 +18,5 @@ Many people spend money throughout the month without realizing how much they are
 ### 🛠️ Built with
 
 HTML • CSS • JavaScript
+
+Netify: https://where-did-my-money-g.netlify.app/
