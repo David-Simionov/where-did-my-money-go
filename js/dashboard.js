@@ -21,7 +21,6 @@ function renderDashboard() {
     renderProfile();
 }
 
-// колку е подолг износот, толку е помал фонтот, за да собере во кругот
 function setDonutTotal(amount) {
     const el = document.getElementById('donutTotal');
     const len = formatMoney(amount).length;
@@ -42,7 +41,6 @@ function renderBreakdown() {
 
     let start = 0;
 
-    // градиме conic-gradient: секоја категорија добива свој дел од кругот
     const stops = data.categories.map(c => {
         const end = start + (c.amount / total) * 100;
         const stop = `${c.color} ${start}% ${end}%`;
@@ -54,7 +52,6 @@ function renderBreakdown() {
         `conic-gradient(${stops.join(', ')})`;
     setDonutTotal(total);
 
-    // легенда
     document.getElementById('legend').innerHTML = data.categories.map(c => {
         const percent = Math.round((c.amount / total) * 100);
         return `
@@ -77,7 +74,6 @@ function updateChipFades() {
     wrap.classList.toggle('chips-wrap--right', box.scrollLeft + box.clientWidth < box.scrollWidth - 4);
 }
 
-// избраната категорија секогаш се гледа цела
 function scrollActiveChip(behavior = 'smooth') {
     const box = document.getElementById('chips');
     const active = box.querySelector('.chip--active');
@@ -93,7 +89,7 @@ function scrollActiveChip(behavior = 'smooth') {
 
 function renderChips() {
     const box = document.getElementById('chips');
-    const keep = box.scrollLeft;   // не скокај на почеток при секое прецртување
+    const keep = box.scrollLeft;
 
     box.innerHTML = data.categories.map((cat, i) => `
         <button class="chip ${i === selectedIndex ? 'chip--active' : ''}" data-index="${i}">
@@ -117,7 +113,6 @@ document.getElementById('chipsRight').addEventListener('click', () => {
     box.scrollBy({ left: box.clientWidth * 0.7, behavior: 'smooth' });
 });
 
-// клик на chip (event delegation, се закачува само еднаш)
 document.getElementById('chips').addEventListener('click', (e) => {
     const btn = e.target.closest('.chip');
     if (!btn) return;
@@ -146,7 +141,6 @@ function renderContext() {
 
     renderChips();
 
-    // пресметки
     const daysPassed = new Date().getDate();
     const perDay = c.amount / daysPassed;
     const incomePct = data.income > 0 ? Math.round((c.amount / data.income) * 100) : null;
@@ -158,7 +152,6 @@ function renderContext() {
     const prevMonth = getMonthName(new Date(now.getFullYear(), now.getMonth() - 1));
     const catLower = t(c.name).toLowerCase();
 
-    // приказ
     document.getElementById('ctxHeadline').innerHTML =
         t('You spent {amount} on {cat}.', {
             amount: `<strong>${formatMoney(c.amount)}</strong>`,
@@ -177,7 +170,6 @@ function renderContext() {
     }
     document.getElementById('ctxTrendLabel').textContent = t('vs {month}', { month: prevMonth });
 
-    // insight
     let insight;
     if (diff === 0) {
         insight = t('You spent the same on {cat} as in {month}.', { cat: catLower, month: prevMonth });
@@ -204,12 +196,10 @@ function renderTips() {
 
     const list = tips[currentLang] || tips.en;
 
-    // "типичен месец": ако овој месец допрва почнал, се користи поголемиот од двата
     const base = Math.max(c.amount, c.previous);
     const monthly = Math.round(base * savePct) / 100;
     const yearly = Math.round(monthly * 12 * 100) / 100;
 
-    // колку месеци до првата недовршена цел
     const goal = goals.find(g => g.saved < g.target);
     let goalLine = '';
     if (goal && monthly > 0) {
@@ -272,7 +262,6 @@ function renderHighlights() {
         });
     }
 
-    // 2. спрема минатиот месец (исти денови)
     const cmp = comparePeriod();
     if (cmp.prevTotal > 0 && cmp.diff !== 0 && cmp.day >= MIN_COMPARE_DAYS) {
         const more = cmp.diff > 0;
@@ -287,7 +276,6 @@ function renderHighlights() {
         });
     }
 
-    // 3. надминати буџети
     const over = [];
     if (budgets.overall > 0 && data.spent > budgets.overall) {
         over.push({ key: 'overall', by: data.spent - budgets.overall });

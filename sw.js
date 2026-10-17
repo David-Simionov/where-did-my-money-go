@@ -22,7 +22,6 @@ self.addEventListener('activate', (e) => {
 });
 
 function save(req, res) {
-    // чуваме само успешни (или "opaque" од Google Fonts) одговори
     if (res.ok || res.type === 'opaque') {
         const copy = res.clone();
         caches.open(CACHE).then(c => c.put(req, copy));
@@ -39,13 +38,11 @@ self.addEventListener('fetch', (e) => {
     const isFont = url.hostname === 'fonts.googleapis.com' || url.hostname === 'fonts.gstatic.com';
     if (!sameOrigin && !isFont) return;
 
-    // фонтови: прво кеш (не се менуваат)
     if (isFont) {
         e.respondWith(caches.match(req).then(hit => hit || fetch(req).then(res => save(req, res))));
         return;
     }
 
-    // наши датотеки: прво мрежа, а без интернет од кеш
     e.respondWith(
         fetch(req)
             .then(res => save(req, res))

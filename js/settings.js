@@ -1,7 +1,6 @@
 // ============ SETTINGS ============
 const CURRENCIES = { EUR: '€', USD: '$', GBP: '£', MKD: 'ден' };
 
-// пред да се направи ништо: дали корисникот е нов?
 const isFirstRun = localStorage.getItem('settings') === null;
 
 function loadSettings() {
@@ -24,7 +23,6 @@ function currencySymbol() {
     return CURRENCIES[settings.currency] || '€';
 }
 
-// симболот во полињата за износ (€ / $ / £ / ден)
 function applyCurrencySymbols(sym = currencySymbol(), root = document) {
     root.querySelectorAll('.money-input').forEach(box => {
         box.querySelector('.money-input__symbol').textContent = sym;
@@ -37,7 +35,6 @@ function renderProfile() {
         settings.name ? settings.name.charAt(0).toUpperCase() : '👤';
 }
 
-// ---- форма ----
 const settingsModal = document.getElementById('settingsModal');
 const settingsForm = document.getElementById('settingsForm');
 
@@ -54,7 +51,6 @@ function closeSettingsModal() {
     settingsModal.classList.remove('modal--open');
 }
 
-// симболот во "Monthly income" се менува веднаш кога ќе избереш валута
 document.getElementById('settingsCurrency').addEventListener('change', (e) => {
     applyCurrencySymbols(CURRENCIES[e.target.value], settingsForm);
 });
@@ -77,15 +73,12 @@ settingsForm.addEventListener('submit', (e) => {
     saveSettings();
     applyCurrencySymbols();
     closeSettingsModal();
-
-    // валутата и јазикот се користат насекаде, па прецртуваме сè
     applyLanguage();
 });
 
 // ---- Export CSV ----
 function csvCell(value) {
     let text = String(value);
-    // Excel извршува формули што почнуваат со = + - @ (CSV injection), па ги "неутрализираме"
     if (/^[=+\-@]/.test(text)) text = "'" + text;
     return '"' + text.replace(/"/g, '""') + '"';
 }
@@ -98,7 +91,6 @@ function exportCSV() {
 
     const csv = [header, ...rows].map(r => r.map(csvCell).join(',')).join('\n');
 
-    // \ufeff (BOM) за да ја препознае Excel кирилицата
     const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
 

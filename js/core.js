@@ -18,7 +18,6 @@ const CATEGORIES = [
 ];
 
 // ============ ПОДАТОЦИ ============
-// data се пресметува од листата expenses (ништо не се пишува рачно)
 const data = {
     income: 0,
     categories: [],
@@ -122,7 +121,6 @@ function getGreeting() {
     return settings.name ? `${part}, ${settings.name} 👋` : `${part} 👋`;
 }
 
-// колку е подолг износот, толку е помал фонтот
 function fitText(el, text, basePx) {
     el.textContent = text;
     const len = text.length;
@@ -130,7 +128,6 @@ function fitText(el, text, basePx) {
     el.style.fontSize = Math.round(basePx * scale) + 'px';
 }
 
-// текстот го внесува корисникот, па го "чистиме" пред да го ставиме во HTML
 function escapeHtml(text) {
     return text.replace(/[&<>"']/g, ch => ({
         '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
@@ -147,14 +144,12 @@ function dayLabel(iso) {
     });
 }
 
-// ============ СПОРЕДБА СО МИНАТИОТ МЕСЕЦ (се користи на Почетна и во Анализа) ============
-const MIN_COMPARE_DAYS = 5;   // пред ова споредбата со минатиот месец е премногу "бучна"
+const MIN_COMPARE_DAYS = 5;
 
 function signed(n) {
     return (n > 0 ? '+' : n < 0 ? '−' : '') + formatMoney(Math.abs(n));
 }
 
-// овој месец досега, спрема ИСТИТЕ денови од минатиот месец (фер споредба)
 function comparePeriod() {
     const now = new Date();
     const day = now.getDate();
@@ -192,10 +187,9 @@ function comparePeriod() {
 
 // ============ АНИМАЦИИ ============
 const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-const lastShown = {};   // последната прикажана вредност по клуч
-const runs = {};        // кој "број" е последен, за да не се тепаат две анимации
+const lastShown = {};
+const runs = {};
 
-// го "брои" износот од претходната до новата вредност
 function animateNumber(key, to, apply) {
     const from = lastShown[key] ?? 0;
     lastShown[key] = to;

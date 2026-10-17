@@ -6,7 +6,6 @@ const pr = (id) => document.getElementById(id);
 const proModal = pr('proModal');
 
 // ---------- Броење ----------
-// Безбедно: не паѓа ако скриптата е блокирана (adblock) или си офлајн.
 function track(path, title) {
     try {
         if (window.goatcounter && window.goatcounter.count) {
@@ -17,7 +16,6 @@ function track(path, title) {
     return false;
 }
 
-// Еднаш по уред: еден љубопитен корисник што допира 5 пати не ги надувува бројките.
 function trackOnce(path, title) {
     let done = [];
     try { done = JSON.parse(localStorage.getItem('proTracked')) || []; } catch (e) {}

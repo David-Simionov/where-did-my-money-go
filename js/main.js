@@ -1,5 +1,4 @@
 // ============ ЈАЗИК: листи и прецртување ============
-// селектите и полињата за буџет се градат со преведени имиња на категории
 function buildLists() {
     const catValue = categorySelect.value;
     const filterValue = filterSelect.value;
@@ -21,10 +20,9 @@ function buildLists() {
         </label>`).join('');
 }
 
-// менува јазик: статичниот текст, листите, па сè што се црта од податоци
 function applyLanguage() {
     setLanguage(settings.language);
-    translateDom();   // мора ПРЕД refresh(), за да не се допираат веќе нацртаните листи
+    translateDom();
     buildLists();
     refresh();
     renderGoals();
@@ -32,14 +30,12 @@ function applyLanguage() {
 }
 
 // ============ PWA ============
-// 1. service worker (работи само преку https или localhost, не преку file://)
 if ('serviceWorker' in navigator && location.protocol !== 'file:') {
     window.addEventListener('load', () => {
         navigator.serviceWorker.register('sw.js').catch(() => {});
     });
 }
 
-// 2. копче "Install app"
 let installEvent = null;
 const installBtn = document.getElementById('installApp');
 const iosHint = document.getElementById('iosHint');
@@ -65,7 +61,6 @@ installBtn.addEventListener('click', async () => {
 
 window.addEventListener('appinstalled', () => { installBtn.hidden = true; });
 
-// iPhone нема автоматски прозорец, па покажуваме упатство
 if (isIOS && !isInstalled) iosHint.hidden = false;
 
 // ============ МЕНИ ДОЛУ (екрани) ============
@@ -78,7 +73,7 @@ function showPage(name) {
     navButtons.forEach(b => b.classList.toggle('nav-btn--active', b.dataset.page === name));
 
     window.scrollTo({ top: 0 });
-    scrollActiveChip('auto');   // мерките постојат дури кога екранот е видлив
+    scrollActiveChip('auto');
     updateChipFades();
 }
 

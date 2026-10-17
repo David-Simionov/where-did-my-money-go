@@ -303,7 +303,7 @@ function locale() {
     return LOCALES[currentLang];
 }
 
-// t('You spent {amount}.', { amount: '€5' })
+
 function t(key, params) {
     const dict = DICT[currentLang];
     let text = key;
@@ -313,11 +313,10 @@ function t(key, params) {
             text = dict[key];
         } else if (/[A-Za-z]{3}/.test(key) && !warned.has(key)) {
             warned.add(key);
-            console.warn('Missing translation:', key);   // ти кажува што си заборавил да преведеш
+            console.warn('Missing translation:', key);
         }
     }
 
-    // една постапка, па текст од корисникот (опис) никогаш не се третира како {параметар}
     return params
         ? text.replace(/\{(\w+)\}/g, (m, k) => (k in params ? params[k] : m))
         : text;
@@ -337,7 +336,7 @@ function monthTitle(date) {
 }
 
 // ============ ПРЕВОД НА СТАТИЧНИОТ HTML ============
-const originalText = new WeakMap();   // текстуален јазол → оригинален англиски текст
+const originalText = new WeakMap();
 
 function translateDom() {
     const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
@@ -349,7 +348,7 @@ function translateDom() {
 
         if (!originalText.has(node)) {
             const key = node.nodeValue.trim();
-            if (!key || !Object.hasOwn(DICT.mk, key)) continue;   // само познати текстови
+            if (!key || !Object.hasOwn(DICT.mk, key)) continue;
             originalText.set(node, {
                 key,
                 pre: node.nodeValue.match(/^\s*/)[0],
@@ -361,7 +360,6 @@ function translateDom() {
         node.nodeValue = o.pre + t(o.key) + o.post;
     }
 
-    // placeholder и aria-label
     document.querySelectorAll('[placeholder], [aria-label]').forEach(el => {
         el._i18n = el._i18n || {};
         ['placeholder', 'aria-label'].forEach(attr => {

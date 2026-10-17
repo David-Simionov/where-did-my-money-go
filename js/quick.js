@@ -18,8 +18,6 @@ function saveRecurring() {
 
 const recurring = loadRecurring();
 
-// Создава трошоци за месеците што ги пропуштил (на пример ако не си ја отворил апликацијата).
-// Враќа колку трошоци се додадени.
 function runRecurring() {
     const today = toISODate(new Date());
     const nowKey = today.slice(0, 7);
@@ -113,7 +111,6 @@ function buildMemory() {
         m.n++;
     });
 
-    // последните различни описи (за брзо повторување)
     const recent = [];
     for (let i = expenses.length - 1; i >= 0 && recent.length < 4; i--) {
         const key = (expenses[i].description || '').trim().toLowerCase();
@@ -141,7 +138,6 @@ function buildKeys() {
 function renderQuickCats() {
     const counts = qa.mem.catCount;
 
-    // најчестите категории се напред
     const list = CATEGORIES
         .map((c, i) => ({ c, i, n: counts[c.name] || 0 }))
         .sort((a, b) => b.n - a.n || a.i - b.i)
@@ -213,7 +209,7 @@ function pressKey(k) {
     } else if (k === '.') {
         if (!a.includes('.')) a = (a || '0') + '.';
     } else {
-        if (a === '0') a = '';                                  // нема водечки нули
+        if (a === '0') a = '';
         const next = a + k;
         const dec = next.split('.')[1] || '';
         if (dec.length > 2 || parseFloat(next) > MAX_AMOUNT) return;
@@ -231,7 +227,7 @@ function saveQuick() {
 
     const today = toISODate(new Date());
     const date = qe('qaDate').value || today;
-    if (date > today) return;                                   // нема датум во иднина
+    if (date > today) return;
 
     const payment = document.querySelector('input[name="qaPayment"]:checked').value;
     const description = qe('qaDesc').value.trim();
@@ -246,7 +242,7 @@ function saveQuick() {
         recurring.push({
             id: recId, amount, category: qa.cat, description, payment,
             day: new Date(date + 'T00:00:00').getDate(),
-            last: date.slice(0, 7)                              // овој месец е веќе покриен
+            last: date.slice(0, 7)
         });
         saveRecurring();
     }
@@ -254,9 +250,9 @@ function saveQuick() {
     expenses.push(exp);
     saveExpenses();
     localStorage.setItem('lastPayment', payment);
-    if (repeat) runRecurring();                                 // ако датумот е во минатото, дополни ги месеците
+    if (repeat) runRecurring();
 
-    if (typeof viewOffset !== 'undefined') viewOffset = 0;      // (само ако го имаш Дел 16) врати на тековен месец
+    if (typeof viewOffset !== 'undefined') viewOffset = 0;
 
     closeQuick();
     refresh(exp.category);
@@ -301,7 +297,6 @@ qe('qaDesc').addEventListener('input', () => {
     const q = qe('qaDesc').value.trim().toLowerCase();
     if (!q) return showSuggest([]);
 
-    // познат опис: категоријата се бира сама (освен ако веќе си избрал рачно)
     const hit = qa.mem.byDesc.get(q);
     if (hit && !qa.catTouched) {
         qa.cat = topCat(hit.cats);
@@ -337,7 +332,6 @@ qe('qaAdd').addEventListener('click', saveQuick);
 qe('closeQuick').addEventListener('click', closeQuick);
 qe('quickBackdrop').addEventListener('click', closeQuick);
 
-// тастатура (на компјутер)
 document.addEventListener('keydown', (e) => {
     if (!qaModal.classList.contains('modal--open')) return;
 
@@ -363,20 +357,18 @@ function syncRecurring() {
     const n = runRecurring();
     if (n) {
         refresh();
-        setTimeout(() => showToast(t('Recurring expenses added: {n}', { n })), 2000);   // по splash-от
+        setTimeout(() => showToast(t('Recurring expenses added: {n}', { n })), 2000);
     }
 }
 
 syncRecurring();
 renderRecurring();
 
-// ако апликацијата стои отворена во позадина (PWA), провери кога ќе се врати на екран
 document.addEventListener('visibilitychange', () => {
     if (!document.hidden) syncRecurring();
 });
 
 // ---------- 9. Брзо повторување ----------
-// Комбинации (опис + категорија) што си ги внел најмалку 2 пати во последните ~4 месеци.
 function pickAmount(g) {
     return Number(Object.entries(g.amounts)
         .sort((a, b) => b[1].n - a[1].n || b[1].last.localeCompare(a[1].last))[0][0]);
@@ -393,7 +385,7 @@ function topCombos(limit = 5) {
 
     expenses.forEach(e => {
         const desc = (e.description || '').trim();
-        if (e.rec || !desc || e.date < horizon) return;          // без автоматски и без опис
+        if (e.rec || !desc || e.date < horizon) return;
 
         const key = desc.toLowerCase() + '|' + e.category;
         let g = groups.get(key);
@@ -403,7 +395,7 @@ function topCombos(limit = 5) {
         }
 
         g.n++;
-        if (e.date >= g.lastDate) { g.lastDate = e.date; g.desc = desc; }   // последно напишаниот правопис
+        if (e.date >= g.lastDate) { g.lastDate = e.date; g.desc = desc; }
 
         const a = g.amounts[e.amount] || { n: 0, last: '' };
         a.n++;
@@ -435,7 +427,6 @@ function renderQuickRepeat() {
     qe('quickRepeatList').innerHTML = combosCache.map(comboChip).join('');
 }
 
-// Модал: копчиња што само ја пополнуваат формата
 function renderModalCombos() {
     combosCache = topCombos(5);
     qe('qaCombos').innerHTML = combosCache.map(comboChip).join('');
@@ -444,7 +435,7 @@ function renderModalCombos() {
 let lastComboTap = 0;
 
 function addCombo(c) {
-    if (Date.now() - lastComboTap < 700) return;                // двоен допир = еден трошок
+    if (Date.now() - lastComboTap < 700) return;
     lastComboTap = Date.now();
 
     const exp = {
@@ -465,7 +456,7 @@ function addCombo(c) {
 function fillFromCombo(c) {
     qa.amount = String(+c.amount.toFixed(2));
     qa.cat = c.cat;
-    qa.catTouched = true;                                       // описот да не ја менува категоријата
+    qa.catTouched = true;
     qe('qaDesc').value = c.desc;
     showSuggest([]);
 

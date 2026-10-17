@@ -6,7 +6,6 @@ function buildInsights() {
     const monthExpenses = expenses.filter(e => e.date.startsWith(thisMonth));
     const insights = [];
 
-    // 1. Категорија со најголем пораст
     const risers = data.categories
         .filter(c => c.previous > 0 && c.amount > c.previous)
         .sort((a, b) => (b.amount - b.previous) - (a.amount - a.previous));
@@ -24,7 +23,6 @@ function buildInsights() {
         });
     }
 
-    // 2. Претплати
     if (subs.length) {
         const monthly = subs.reduce((sum, s) => sum + s.amount, 0);
         insights.push({
@@ -37,7 +35,6 @@ function buildInsights() {
         });
     }
 
-    // 3. Најголем трошок
     if (monthExpenses.length) {
         const big = monthExpenses.reduce((a, b) => (b.amount > a.amount ? b : a));
         const label = big.description ? ` (${escapeHtml(big.description)})` : '';
@@ -50,7 +47,6 @@ function buildInsights() {
         });
     }
 
-    // 4. Викенд vs работни денови
     let weekendDays = 0, weekdayDays = 0, weekendSum = 0, weekdaySum = 0;
 
     for (let d = 1; d <= now.getDate(); d++) {
@@ -80,7 +76,6 @@ function buildInsights() {
         }
     }
 
-    // 5. Мали купувања
     const small = monthExpenses.filter(e => e.amount < 10);
     if (small.length >= 3) {
         const smallTotal = small.reduce((sum, e) => sum + e.amount, 0);
@@ -118,7 +113,6 @@ function renderInsights() {
 // ============ ANALYTICS ============
 let analyticsPeriod = 'month';
 
-// секоја "колона" на графикот има име и тест: дали датумот припаѓа тука
 function getBuckets(period) {
     const now = new Date();
     const y = now.getFullYear();
@@ -188,7 +182,6 @@ function renderAnalytics() {
         return;
     }
 
-    // график
     const max = Math.max(...sums);
     const showValues = buckets.length <= 7;
 
@@ -202,7 +195,6 @@ function renderAnalytics() {
             <span class="bar__label">${b.label}</span>
         </div>`).join('') + '</div>';
 
-    // топ категории за истиот период
     const inPeriod = expenses.filter(e => buckets.some(b => b.test(e.date)));
 
     const cats = CATEGORIES
@@ -233,7 +225,7 @@ document.getElementById('analyticsTabs').addEventListener('click', (e) => {
 });
 
 // ============ MONTHLY REVIEW ============
-let reviewOffset = 0;   // 0 = тековен месец, -1 = претходен, ...
+let reviewOffset = 0;
 
 function monthStats(key) {
     const list = expenses.filter(e => e.date.startsWith(key));
@@ -274,7 +266,6 @@ function renderReview() {
     const cur = monthStats(monthKey(date));
     const prev = monthStats(monthKey(prevDate));
 
-    // најраниот месец со трошок (за да не се оди во празнина)
     const earliest = expenses.length
         ? expenses.reduce((min, e) => (e.date < min ? e.date : min), expenses[0].date).slice(0, 7)
         : null;
@@ -319,7 +310,6 @@ function renderReview() {
                 ${trendHtml(a, b)}
             </div>`).join('');
 
-    // стапка на штедење
     let savings;
     if (rate === null) {
         savings = `<p class="empty">${t('Set your monthly income in Settings to see your savings rate.')}</p>`;
@@ -469,7 +459,6 @@ function renderWhy() {
     }
     card.hidden = false;
 
-    // најголемата промена во спротивна насока
     const other = cmp.rows
         .filter(r => (more ? r.diff < 0 : r.diff > 0))
         .sort((a, b) => (more ? a.diff - b.diff : b.diff - a.diff))[0];

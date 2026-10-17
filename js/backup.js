@@ -50,7 +50,6 @@ function cleanBackup(d) {
     const safeCat = (c) => (CAT_NAMES.has(c) ? c : 'Other');
     const safePay = (p) => (PAYMENTS.includes(p) ? p : 'Card');
 
-    // трошоци (задолжително)
     const ex = cleanList(d.expenses, (e) => {
         if (!isObj(e)) return null;
         const amount = cleanMoney(e.amount);
@@ -70,7 +69,6 @@ function cleanBackup(d) {
     out.expenses = ex.out;
     out.skipped += ex.skipped;
 
-    // буџети
     if (isObj(d.budgets)) {
         const overall = cleanNum(d.budgets.overall);
         const categories = {};
@@ -83,7 +81,6 @@ function cleanBackup(d) {
         out.budgets = { overall: overall > 0 && overall <= MAX_AMOUNT ? overall : 0, categories };
     }
 
-    // цели
     if (Array.isArray(d.goals)) {
         const g = cleanList(d.goals, (x) => {
             if (!isObj(x)) return null;
@@ -102,7 +99,6 @@ function cleanBackup(d) {
         out.skipped += g.skipped;
     }
 
-    // претплати
     if (Array.isArray(d.subs)) {
         const s = cleanList(d.subs, (x) => {
             if (!isObj(x)) return null;
@@ -115,7 +111,6 @@ function cleanBackup(d) {
         out.skipped += s.skipped;
     }
 
-    // повторливи трошоци
     if (Array.isArray(d.recurring)) {
         const r = cleanList(d.recurring, (x) => {
             if (!isObj(x)) return null;
@@ -135,7 +130,6 @@ function cleanBackup(d) {
         out.skipped += r.skipped;
     }
 
-    // поставки
     if (isObj(d.settings)) {
         const s = d.settings;
         const income = cleanNum(s.income);
@@ -208,7 +202,7 @@ function applyRestore(clean) {
 
     try {
         Object.keys(writes).forEach(k => localStorage.setItem(k, JSON.stringify(writes[k])));
-        if (clean.theme) localStorage.setItem('theme', clean.theme);   // темата е обичен текст, не JSON
+        if (clean.theme) localStorage.setItem('theme', clean.theme);
     } catch {
         keys.forEach((k, i) => (before[i] === null ? localStorage.removeItem(k) : localStorage.setItem(k, before[i])));
         alert(t('Could not restore the backup.'));
@@ -278,5 +272,5 @@ bk('openSettings').addEventListener('click', updateBackupInfo);
 
 if (sessionStorage.getItem('restored')) {
     sessionStorage.removeItem('restored');
-    setTimeout(() => showToast(t('Backup restored ✓')), 2200);   // по splash-от
+    setTimeout(() => showToast(t('Backup restored ✓')), 2200);
 }

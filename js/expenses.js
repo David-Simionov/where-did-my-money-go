@@ -3,7 +3,7 @@ const modal = document.getElementById('modal');
 const form = document.getElementById('expenseForm');
 const categorySelect = document.getElementById('categorySelect');
 
-let editingId = null;   // null = додаваме ново, id = уредуваме постоечко
+let editingId = null;
 
 function openModal(expense) {
     form.reset();
@@ -72,7 +72,6 @@ const filterSelect = document.getElementById('filterSelect');
 function renderTransactions() {
     const q = searchQuery.trim().toLowerCase();
 
-    // најново најгоре (reverse + стабилен sort по датум)
     const list = [...expenses]
         .reverse()
         .sort((a, b) => b.date.localeCompare(a.date))
@@ -88,7 +87,6 @@ function renderTransactions() {
         return;
     }
 
-    // групирање по датум
     const groups = {};
     list.forEach(e => {
         if (!groups[e.date]) groups[e.date] = [];
@@ -129,7 +127,6 @@ function renderTransactions() {
     }).join('');
 }
 
-// пребарување и филтер
 document.getElementById('searchInput').addEventListener('input', (e) => {
     searchQuery = e.target.value;
     renderTransactions();
@@ -140,7 +137,6 @@ filterSelect.addEventListener('change', (e) => {
     renderTransactions();
 });
 
-// Edit / Delete (event delegation)
 document.getElementById('txList').addEventListener('click', (e) => {
     const btn = e.target.closest('.tx__btn');
     if (!btn) return;
@@ -176,7 +172,6 @@ function saveIncomes() {
 
 const incomes = loadIncomes();
 
-// основен месечен приход + дополнителните за тој месец (key = "2026-10")
 function incomeFor(key) {
     const extra = incomes
         .filter(x => x.date.startsWith(key))
@@ -212,7 +207,7 @@ function openIncomeModal() {
     const today = toISODate(new Date());
     incomeForm.reset();
     document.getElementById('incomeDate').value = today;
-    document.getElementById('incomeDate').min = today.slice(0, 7) + '-01';   // само тековен месец
+    document.getElementById('incomeDate').min = today.slice(0, 7) + '-01';
     document.getElementById('incomeDate').max = today;
     renderIncomeList();
     incomeModal.classList.add('modal--open');

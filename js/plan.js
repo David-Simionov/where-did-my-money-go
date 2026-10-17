@@ -73,7 +73,6 @@ function renderBudget() {
         : '<p class="empty">' + t('No budgets yet. Tap Edit to set your first one.') + '</p>';
 }
 
-// ---- форма за уредување на буџети ----
 const budgetModal = document.getElementById('budgetModal');
 const budgetForm = document.getElementById('budgetForm');
 
@@ -111,7 +110,7 @@ budgetForm.addEventListener('submit', (e) => {
     closeBudgetModal();
     renderBudget();
     renderAfford();
-    renderHighlights();   // надминат буџет се гледа и на Почетна
+    renderHighlights();
 });
 
 // ============ SAVINGS GOALS ============
@@ -170,7 +169,6 @@ function renderGoals() {
     }).join('');
 }
 
-// ---- модал: додади пари на цел ----
 const addSavedModal = document.getElementById('addSavedModal');
 const addSavedForm = document.getElementById('addSavedForm');
 let addingToGoalId = null;
@@ -204,10 +202,9 @@ addSavedForm.addEventListener('submit', (e) => {
     saveGoals();
     closeAddSavedModal();
     renderGoals();
-    renderTips();   // советите покажуваат "за колку месеци е целта"
+    renderTips();
 });
 
-// ---- форма за цел ----
 const goalModal = document.getElementById('goalModal');
 const goalForm = document.getElementById('goalForm');
 let editingGoalId = null;
@@ -257,7 +254,6 @@ goalForm.addEventListener('submit', (e) => {
     renderTips();
 });
 
-// + Add / Edit / Delete (event delegation)
 document.getElementById('goalList').addEventListener('click', (e) => {
     const btn = e.target.closest('[data-action]');
     if (!btn) return;
@@ -343,7 +339,6 @@ function renderSubs() {
         </div>`;
 }
 
-// ---- форма за претплата ----
 const subModal = document.getElementById('subModal');
 const subForm = document.getElementById('subForm');
 let editingSubId = null;
@@ -402,11 +397,10 @@ document.getElementById('subList').addEventListener('click', (e) => {
         subs.splice(subs.indexOf(sub), 1);
         saveSubs();
         renderSubs();
-        renderInsights();   // увидот за претплати се менува и при бришење
+        renderInsights();
     }
 });
 
-// Escape ги затвора модалите за цел и претплата
 document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
         closeGoalModal();
